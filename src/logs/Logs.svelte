@@ -1,5 +1,4 @@
 <script>
-  import PopuotWindowTransitionWrapper from "./PopuotWindowTransitionWrapper.svelte";
   import { listen } from "@tauri-apps/api/event";
   import VirtualList from "../components/utils/VirtualList.svelte";
   import LogMessage from "../components/log/LogMessage.svelte";
@@ -31,7 +30,7 @@
     await invoke("upload_logs", {
       log: $minecraftLogs.join(""),
     }).then((result) => {
-      console.debug("Received Result", result);
+      addNotification("Logs uploaded successfully. URL copied to clipboard.", "INFO");
       navigator.clipboard.writeText(result.url);
     }).catch((error) => {
       addNotification(error);
@@ -43,27 +42,48 @@
   }
 </script>
 
-<PopuotWindowTransitionWrapper>
+
+<div class="black-bar" data-tauri-drag-region>
+</div>
+<main class="content">
   <div class="logs-wrapper">
     <VirtualList items={$minecraftLogs} let:item {autoScroll}>
       <LogMessage text={item} />
     </VirtualList>
-    <div class="logs-button-wrapper">
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <h1 class:auto-scroll-button-on={autoScroll} class:auto-scroll-button-off={!autoScroll}
-          on:click={toggleAutoScroll}>
-        [Auto Scroll]
-      </h1>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <h1 class="copy-button" on:click={uploadLogs}>
-        [Copy]
-      </h1>
-    </div>
   </div>
-</PopuotWindowTransitionWrapper>
-
+</main>
+<div class="black-bar" data-tauri-drag-region>
+  <div class="logs-button-wrapper">
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <h1
+      class:auto-scroll-button-on={autoScroll}
+      class:green-text={autoScroll}
+      class:auto-scroll-button-off={!autoScroll}
+      class:red-text={!autoScroll}
+      on:click={toggleAutoScroll}
+    >[Auto Scroll]</h1>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <h1 class="copy-button primary-text" on:click={uploadLogs}>
+      [Copy]
+    </h1>
+  </div>
+</div>
 
 <style>
+    .black-bar {
+        display: flex;
+        align-content: center;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 10vh;
+        background-color: #151515;
+    }
+
+    .content {
+        height: 80vh;
+    }
+
     .logs-wrapper {
         height: 100%;
         display: flex;
@@ -75,14 +95,13 @@
         display: flex;
         justify-content: space-between;
         padding: 1em;
+        gap: 2em;
     }
 
     .copy-button {
         transition: 0.3s;
         font-family: 'Press Start 2P', serif;
         font-size: 17px;
-        color: var(--primary-color);
-        text-shadow: 2px 2px var(--primary-color-text-shadow);
         cursor: pointer;
     }
 
@@ -90,8 +109,6 @@
         transition: 0.3s;
         font-family: 'Press Start 2P', serif;
         font-size: 17px;
-        color: #0bb00b;
-        text-shadow: 2px 2px #086b08;
         cursor: pointer;
     }
 
@@ -99,8 +116,6 @@
         transition: 0.3s;
         font-family: 'Press Start 2P', serif;
         font-size: 17px;
-        color: red;
-        text-shadow: 2px 2px #460000;
         cursor: pointer;
     }
 

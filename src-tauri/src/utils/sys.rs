@@ -5,6 +5,12 @@ use serde::Deserialize;
 use sysinfo::{RefreshKind, System, SystemExt};
 
 /// Get the total memory of the system in bytes
+pub fn total_memory() -> i64 {
+    let sys = System::new_with_specifics(RefreshKind::new().with_memory());
+
+    sys.total_memory() as i64
+}
+
 pub fn percentage_of_total_memory(memory_percentage: i32) -> i64 {
     let sys = System::new_with_specifics(RefreshKind::new().with_memory());
 
@@ -46,7 +52,7 @@ pub enum OperatingSystem {
     #[serde(rename = "osx")]
     OSX,
     #[serde(rename = "unknown")]
-    UNKNOWN
+    UNKNOWN,
 }
 
 #[derive(Deserialize, Clone, PartialEq, Eq, Hash, Debug)]
@@ -60,7 +66,7 @@ pub enum Architecture {
     #[serde(rename = "aarch64")]
     AARCH64,
     #[serde(rename = "unknown")]
-    UNKNOWN
+    UNKNOWN,
 }
 
 impl OperatingSystem {
@@ -89,7 +95,6 @@ impl OperatingSystem {
             _ => bail!("Invalid OS")
         })
     }
-
 }
 
 impl Display for OperatingSystem {

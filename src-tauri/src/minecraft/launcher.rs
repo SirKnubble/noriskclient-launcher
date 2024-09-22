@@ -36,6 +36,8 @@ pub struct LauncherData<D: Send + Sync> {
 impl<D: Send + Sync> ProgressReceiver for LauncherData<D> {
     fn progress_update(&self, progress_update: ProgressUpdate) {
         let _ = (self.on_progress)(&self.data, progress_update);
+        //ui update
+        let _ = (self.on_progress)(&self.data, ProgressUpdate::set_max());
     }
 }
 
@@ -333,7 +335,7 @@ pub async fn launch<D: Send + Sync>(norisk_token: &str, uuid: &str, data: &Path,
     launcher_data_arc.progress_update(ProgressUpdate::set_label("Launching..."));
     launcher_data_arc.progress_update(ProgressUpdate::set_to_max());
 
-    let mut running_task = java_runtime.execute(mapped, &game_dir).await?;
+    let mut running_task = java_runtime.execute(mapped, &game_dir)?;
 
     if !launching_parameter.keep_launcher_open {
         // Hide launcher window
