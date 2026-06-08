@@ -28,6 +28,7 @@ import {
   type NrcCompatibilityData,
 } from "../../../utils/nrc-compatibility";
 import { useTranslation } from "react-i18next";
+import * as ProfileService from "../../../services/profile-service";
 import { parseErrorMessage } from "../../../utils/error-utils";
 
 function NrcCompatibleTooltipContent() {

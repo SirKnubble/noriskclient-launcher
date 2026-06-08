@@ -22,6 +22,10 @@ import { PERMISSION } from "../../constants/permissions";
 import { useTranslation } from "react-i18next";
 import { DesignerSettingsTab } from "./settings/DesignerSettingsTab";
 import { cn } from "../../lib/utils";
+import {
+  getGlobalMemorySettings,
+  setGlobalMemorySettings,
+} from "../../services/launcher-config-service";
 import { parseErrorMessage } from "../../utils/error-utils";
 
 interface ProfileSettingsProps {
