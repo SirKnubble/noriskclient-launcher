@@ -295,7 +295,8 @@ export function ProfilesTabV2() {
   };
 
   // Columns per layout mode (also used by the virtual grid).
-  const columnCount = layoutMode === "grid" ? 2 : layoutMode === "compact" ? 3 : 1;
+  const columnCount =
+    layoutMode === "grid" ? 2 : layoutMode === "compact" ? 3 : 1;
 
   // Filter -> sort (memoized; avoids re-running on unrelated re-renders like hover).
   const filteredProfiles = useMemo(
@@ -309,7 +310,9 @@ export function ProfilesTabV2() {
         const matchesVersion =
           selectedVersions.length === 0 ||
           selectedVersions.includes(toVersionMajor(profile.game_version));
-        return matchesSearch && profileMatchesActiveGroup(profile) && matchesVersion;
+        return (
+          matchesSearch && profileMatchesActiveGroup(profile) && matchesVersion
+        );
       }),
     [profiles, searchQuery, activeGroup, selectedVersions],
   );
@@ -334,16 +337,24 @@ export function ProfilesTabV2() {
             return a.name.localeCompare(b.name);
           }
           case "date_created":
-            return new Date(b.created).getTime() - new Date(a.created).getTime();
+            return (
+              new Date(b.created).getTime() - new Date(a.created).getTime()
+            );
           case "version_newest":
             return (
-              (b.game_version || "").localeCompare(a.game_version || "", undefined, { numeric: true }) ||
-              a.name.localeCompare(b.name)
+              (b.game_version || "").localeCompare(
+                a.game_version || "",
+                undefined,
+                { numeric: true },
+              ) || a.name.localeCompare(b.name)
             );
           case "version_oldest":
             return (
-              (a.game_version || "").localeCompare(b.game_version || "", undefined, { numeric: true }) ||
-              a.name.localeCompare(b.name)
+              (a.game_version || "").localeCompare(
+                b.game_version || "",
+                undefined,
+                { numeric: true },
+              ) || a.name.localeCompare(b.name)
             );
           default:
             return a.name.localeCompare(b.name);
@@ -383,7 +394,12 @@ export function ProfilesTabV2() {
     return out;
   }, [sortedProfiles, selectedVersions, columnCount]);
 
-  const gridColsClass = columnCount === 3 ? "grid-cols-3" : columnCount === 2 ? "grid-cols-2" : "grid-cols-1";
+  const gridColsClass =
+    columnCount === 3
+      ? "grid-cols-3"
+      : columnCount === 2
+        ? "grid-cols-2"
+        : "grid-cols-1";
 
   if (loading) {
     return <LoadingState message={t("profiles.loadingProfiles")} />;
@@ -480,7 +496,7 @@ export function ProfilesTabV2() {
                     size="sm"
                   />
                 }
-            />
+              />
 
               {/* Layout Toggle Button - Right next to SearchWithFilters */}
               <button
@@ -516,8 +532,9 @@ export function ProfilesTabV2() {
           </div>
         </div>
 
-      {/* Virtualized profile list. Version-divider headers appear only while a version filter is active. */}
-      <div className={
+        {/* Virtualized profile list. Version-divider headers appear only while a version filter is active. */}
+        <div
+          className={
             isFullRiskStyle && layoutMode === "grid"
               ? "mx-auto flex max-w-[1280px] flex-wrap justify-center gap-x-10 gap-y-24 items-start pb-10"
               : layoutMode === "list"
@@ -525,57 +542,62 @@ export function ProfilesTabV2() {
                 : layoutMode === "grid"
                   ? "grid grid-cols-2 gap-3"
                   : "grid grid-cols-3 gap-3"
-          }>
-        {virtualRows.length === 0 ? (
-          <EmptyState icon="solar:widget-bold" message={t('profiles.noProfilesFound')} />
-        ) : (
-          <Virtuoso
-            data={virtualRows}
-            className="custom-scrollbar"
-            style={{ height: "100%" }}
-            itemContent={(_index, row) => {
-              if (row.type === "header") {
+          }
+        >
+          {virtualRows.length === 0 ? (
+            <EmptyState
+              icon="solar:widget-bold"
+              message={t("profiles.noProfilesFound")}
+            />
+          ) : (
+            <Virtuoso
+              data={virtualRows}
+              className="custom-scrollbar"
+              style={{ height: "100%" }}
+              itemContent={(_index, row) => {
+                if (row.type === "header") {
+                  return (
+                    // Version divider header, e.g. "── 26.1 ──────────────"
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="h-px w-6 bg-white/10" />
+                      <span className="font-minecraft text-2xl lowercase text-white/60 whitespace-nowrap">
+                        {row.version}
+                      </span>
+                      <div className="h-px flex-1 bg-white/10" />
+                    </div>
+                  );
+                }
                 return (
-                  // Version divider header, e.g. "── 26.1 ──────────────"
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="h-px w-6 bg-white/10" />
-                    <span className="font-minecraft text-2xl lowercase text-white/60 whitespace-nowrap">
-                      {row.version}
-                    </span>
-                    <div className="h-px flex-1 bg-white/10" />
+                  <div className={`grid ${gridColsClass} gap-3 mb-3`}>
+                    {row.profiles.map((profile) =>
+                      isFullRiskStyle && layoutMode === "grid" ? (
+                        <FullRiskProfileCard
+                          key={profile.id}
+                          profile={profile}
+                          onSettings={handleSettings}
+                          onMods={handleMods}
+                          onDelete={handleDeleteProfile}
+                          onOpenFolder={handleOpenFolder}
+                        />
+                      ) : (
+                        <ProfileCardV2
+                          key={profile.id}
+                          profile={profile}
+                          onSettings={handleSettings}
+                          onMods={handleMods}
+                          onDelete={handleDeleteProfile}
+                          onOpenFolder={handleOpenFolder}
+                          layoutMode={layoutMode}
+                          variant={isFullRiskStyle ? "3d" : "default"}
+                        />
+                      ),
+                    )}
                   </div>
                 );
-              }
-              return (
-                <div className={`grid ${gridColsClass} gap-3 mb-3`}>
-                  {row.profiles.map((profile) =>
-            isFullRiskStyle && layoutMode === "grid" ? (
-              <FullRiskProfileCard
-                key={profile.id}
-                profile={profile}
-                onSettings={handleSettings}
-                onMods={handleMods}
-                onDelete={handleDeleteProfile}
-                onOpenFolder={handleOpenFolder}
-              />
-            ) : (
-              <ProfileCardV2
-                key={profile.id}
-                profile={profile}
-                onSettings={handleSettings}
-                onMods={handleMods}
-                onDelete={handleDeleteProfile}
-                onOpenFolder={handleOpenFolder}
-                layoutMode={layoutMode}
-                variant={isFullRiskStyle ? "3d" : "default"}
-              />
-                  ),
-                  )}
-                </div>
-              );
-            }}
-          />
-        )}
+              }}
+            />
+          )}
+        </div>
       </div>
 
       {/* Modals from ProfilesTab.tsx */}

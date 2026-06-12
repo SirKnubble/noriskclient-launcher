@@ -1,22 +1,22 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { cn } from '../../lib/utils';
-import { SkinViewer } from './SkinViewer';
-import { MainLaunchButton } from './MainLaunchButton';
-import { useThemeStore } from '../../store/useThemeStore';
-import { useSkinStore } from '../../store/useSkinStore';
-import { MinecraftSkinService } from '../../services/minecraft-skin-service';
-import type { GetStarlightSkinRenderPayload } from '../../types/localSkin';
-import { convertFileSrc } from '@tauri-apps/api/core';
-import { Icon } from '@iconify/react';
-import { ServerLaunchCard } from './ServerLaunchCard';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { StaticTooltip } from '../ui/Tooltip';
-import { toast } from 'sonner';
-import { isWorldCupEventActive } from '../../data/worldcup-event';
-import type { LaunchOverrides } from '../../services/process-service';
+import React, { useCallback, useEffect, useState } from "react";
+import { cn } from "../../lib/utils";
+import { SkinViewer } from "./SkinViewer";
+import { MainLaunchButton } from "./MainLaunchButton";
+import { useThemeStore } from "../../store/useThemeStore";
+import { useSkinStore } from "../../store/useSkinStore";
+import { MinecraftSkinService } from "../../services/minecraft-skin-service";
+import type { GetStarlightSkinRenderPayload } from "../../types/localSkin";
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { Icon } from "@iconify/react";
+import { ServerLaunchCard } from "./ServerLaunchCard";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { StaticTooltip } from "../ui/Tooltip";
+import { toast } from "sonner";
+import { isWorldCupEventActive } from "../../data/worldcup-event";
+import type { LaunchOverrides } from "../../services/process-service";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 
 const DEFAULT_FALLBACK_SKIN_URL = "/skins/default_steve_full.png"; // Defined constant for fallback URL
@@ -66,33 +66,23 @@ interface PlayerActionsDisplayProps {
   displayMode?: "playerName" | "logo";
 }
 
-function FeaturedPromoIcon({ src, alt, size = "md" }: { src: string; alt: string; size?: "sm" | "md" | "lg" }) {
+function FeaturedPromoIcon({
+  src,
+  alt,
+  size = "md",
+}: {
+  src: string;
+  alt: string;
+  size?: "sm" | "md" | "lg";
+}) {
   const [failed, setFailed] = useState(false);
   const sizeClass =
     size === "lg" ? "w-7 h-7" : size === "sm" ? "w-4 h-4" : "w-5 h-5";
 
   if (failed) {
-    return <Icon icon="noto:soccer-ball" className={cn(sizeClass, "shrink-0")} />;
-  }
-
-  return (
-    <img
-      src={src}
-      alt={alt}
-      className={cn(sizeClass, "shrink-0 object-contain")}
-      style={{ imageRendering: "pixelated" }}
-      onError={() => setFailed(true)}
-    />
-  );
-}
-
-function FeaturedPromoIcon({ src, alt, size = "md" }: { src: string; alt: string; size?: "sm" | "md" | "lg" }) {
-  const [failed, setFailed] = useState(false);
-  const sizeClass =
-    size === "lg" ? "w-7 h-7" : size === "sm" ? "w-4 h-4" : "w-5 h-5";
-
-  if (failed) {
-    return <Icon icon="noto:soccer-ball" className={cn(sizeClass, "shrink-0")} />;
+    return (
+      <Icon icon="noto:soccer-ball" className={cn(sizeClass, "shrink-0")} />
+    );
   }
 
   return (
@@ -138,7 +128,9 @@ export function PlayerActionsDisplay({
     }
 
     // Option A: Use currently selected profile from MainLaunchButton
-    const selectedVersion = launchButtonVersions.find(v => v.id === launchButtonDefaultVersion);
+    const selectedVersion = launchButtonVersions.find(
+      (v) => v.id === launchButtonDefaultVersion,
+    );
     return selectedVersion?.profileId || null;
   };
 
@@ -190,30 +182,37 @@ export function PlayerActionsDisplay({
           error,
         );
         try {
-          const activeSkin = await MinecraftSkinService.getActiveSkin().catch(() => null);
+          const activeSkin = await MinecraftSkinService.getActiveSkin().catch(
+            () => null,
+          );
           const payload: GetStarlightSkinRenderPayload = {
             player_name: playerName,
             render_type: "default",
             render_view: "full",
             base64_skin_data: activeSkin?.base64_data ?? null,
           };
-          const localPath = await MinecraftSkinService.getStarlightSkinRender(payload);
+          const localPath =
+            await MinecraftSkinService.getStarlightSkinRender(payload);
           if (localPath) {
             setResolvedSkinUrl(convertFileSrc(localPath));
           } else {
             setResolvedSkinUrl(DEFAULT_FALLBACK_SKIN_URL);
           }
         } catch (error) {
-          console.error("[PlayerActionsDisplay] Failed to fetch starlight skin render:", error);
+          console.error(
+            "[PlayerActionsDisplay] Failed to fetch starlight skin render:",
+            error,
+          );
           setResolvedSkinUrl(DEFAULT_FALLBACK_SKIN_URL);
         }
-      } else {
-        setResolvedSkinUrl(DEFAULT_FALLBACK_SKIN_URL);
       }
-    };
+    },
+    [playerName, skinRevision],
+  );
 
+  useEffect(() => {
     fetchAndSetSkin(getRandomRenderType());
-  }, [playerName, skinRevision]);
+  }, [fetchAndSetSkin]);
 
   const dropShadowX = "2px";
   const dropShadowY = "4px";
@@ -365,7 +364,7 @@ export function PlayerActionsDisplay({
             >
               {!featureMode && worldCupActive ? (
                 <StaticTooltip
-                  content={t('wm.tooltip', {
+                  content={t("wm.tooltip", {
                     version: WM_PUBLIC_VIEWING.gameVersion,
                     server: FEATURED_SERVER.address,
                   })}
@@ -376,8 +375,12 @@ export function PlayerActionsDisplay({
                     className="font-minecraft text-2xl lowercase text-white/70 hover:text-white transition-all duration-200 cursor-pointer bg-transparent border-none p-0 whitespace-nowrap text-shadow"
                   >
                     <span className="flex items-center gap-2">
-                      <FeaturedPromoIcon src={WM_PUBLIC_VIEWING.iconSrc} alt="" size="md" />
-                      {t('wm.public_viewing').toLowerCase()}
+                      <FeaturedPromoIcon
+                        src={WM_PUBLIC_VIEWING.iconSrc}
+                        alt=""
+                        size="md"
+                      />
+                      {t("wm.public_viewing").toLowerCase()}
                     </span>
                   </button>
                 </StaticTooltip>
@@ -387,12 +390,12 @@ export function PlayerActionsDisplay({
                   className="font-minecraft text-2xl lowercase text-white/70 hover:text-white transition-all duration-200 cursor-pointer bg-transparent border-none p-0 whitespace-nowrap text-shadow"
                   title={
                     featureMode
-                      ? t('wm.switch_to_main')
-                      : t('wm.switch_to_hugo', { server: FEATURED_SERVER.name })
+                      ? t("wm.switch_to_main")
+                      : t("wm.switch_to_hugo", { server: FEATURED_SERVER.name })
                   }
                 >
                   {featureMode
-                    ? t('wm.switch_to_main')
+                    ? t("wm.switch_to_main")
                     : FEATURED_SERVER.name.toLowerCase()}
                 </button>
               )}
