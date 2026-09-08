@@ -1,6 +1,6 @@
 # Third-party icon artwork
 
-The launcher bundles 281 icons from the sets below. The artwork is redistributed
+The launcher bundles 329 icons from the sets below. The artwork is redistributed
 unmodified; only the icons actually used are included, extracted from the `@iconify-json/*`
 packages by `scripts/generate-icon-bundle.mjs`.
 
@@ -8,13 +8,13 @@ GENERATED — run `yarn icons` to refresh.
 
 ## Solar (`solar`)
 
-- 219 icons used of 7401
+- 258 icons used of 7401
 - Author: [480 Design](https://www.figma.com/community/file/1166831539721848736)
 - Licence: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (`CC-BY-4.0`)
 
 ## Pixel Icon (`pixel`)
 
-- 10 icons used of 578
+- 17 icons used of 578
 - Author: [HackerNoon](https://github.com/hackernoon/pixel-icon-library)
 - Licence: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (`CC-BY-4.0`)
 
@@ -26,7 +26,7 @@ GENERATED — run `yarn icons` to refresh.
 
 ## Simple Icons (`simple-icons`)
 
-- 8 icons used of 3447
+- 9 icons used of 3447
 - Author: [Simple Icons Collaborators](https://github.com/simple-icons/simple-icons)
 - Licence: [CC0 1.0](https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md) (`CC0-1.0`)
 
@@ -44,7 +44,7 @@ GENERATED — run `yarn icons` to refresh.
 
 ## Material Symbols (`material-symbols`)
 
-- 1 icon used of 15457
+- 2 icons used of 15457
 - Author: [Google](https://github.com/google/material-design-icons)
 - Licence: [Apache 2.0](https://github.com/google/material-design-icons/blob/master/LICENSE) (`Apache-2.0`)
 

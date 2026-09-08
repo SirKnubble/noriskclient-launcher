@@ -283,9 +283,7 @@ export function ResourcePacksTab({
       fetchResourcePacks();
     } catch (err) {
       console.error("Failed to toggle pack enabled state:", err);
-      setResourcePacksError(
-        `Failed to toggle pack: ${parseErrorMessage(err)}`,
-      );
+      setResourcePacksError(`Failed to toggle pack: ${parseErrorMessage(err)}`);
     } finally {
       setLoadingOperation(false);
     }
@@ -331,9 +329,7 @@ export function ResourcePacksTab({
       fetchResourcePacks();
     } catch (err) {
       console.error("Failed to update pack:", err);
-      setResourcePacksError(
-        `Failed to update pack: ${parseErrorMessage(err)}`,
-      );
+      setResourcePacksError(`Failed to update pack: ${parseErrorMessage(err)}`);
 
       setResourcePackUpdates({ ...resourcePackUpdates });
     } finally {
@@ -434,9 +430,7 @@ export function ResourcePacksTab({
       fetchResourcePacks();
     } catch (err) {
       console.error("Failed to delete pack:", err);
-      setResourcePacksError(
-        `Failed to delete pack: ${parseErrorMessage(err)}`,
-      );
+      setResourcePacksError(`Failed to delete pack: ${parseErrorMessage(err)}`);
     } finally {
       setLoadingOperation(false);
     }
@@ -634,7 +628,7 @@ export function ResourcePacksTab({
             <SearchInput
               value={localSearchQuery}
               onChange={setLocalSearchQuery}
-              placeholder={t('resourcepacks.search_placeholder')}
+              placeholder={t("resourcepacks.search_placeholder")}
             />
           </div>
         )}
@@ -722,7 +716,7 @@ export function ResourcePacksTab({
         }}
       >
         {loadingResourcePacks ? (
-          <LoadingState message={t('resourcepacks.loading')} />
+          <LoadingState message={t("resourcepacks.loading")} />
         ) : resourcePacksError ? (
           <div className="p-4 text-red-400 bg-red-900/20 rounded border border-red-700/30">
             <div className="flex items-center gap-2">
@@ -794,7 +788,9 @@ export function ResourcePacksTab({
                       curseforge_info: pack.curseforge_info,
                       sha1_hash: pack.sha1_hash || "",
                       is_disabled: pack.is_disabled,
-                      version: pack.modrinth_info?.version_number || pack.curseforge_info?.version_number,
+                      version:
+                        pack.modrinth_info?.version_number ||
+                        pack.curseforge_info?.version_number,
                     }}
                     isSelected={selectedPacks.has(pack.filename)}
                     onSelect={() => handleSelectPack(pack.filename)}
@@ -808,7 +804,7 @@ export function ResourcePacksTab({
                     onUpdate={hasUpdate ? updatePack : undefined}
                     updateVersion={updateVersion}
                     checkingUpdates={checkingUpdates || isUpdating}
-                    iconType="solar:image-gallery-bold"
+                    iconType="solar:gallery-bold"
                     formatFileSize={formatFileSize}
                     onCheckForUpdates={checkForResourcePackUpdates}
                   />

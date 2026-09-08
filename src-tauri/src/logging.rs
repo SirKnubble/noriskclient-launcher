@@ -10,7 +10,7 @@ use log4rs::append::rolling_file::RollingFileAppender;
 use log4rs::config::{Appender, Config, Logger, Root};
 use log4rs::encode::pattern::PatternEncoder;
 use log4rs::encode::writer::simple::SimpleWriter;
-use log4rs::encode::{Encode, Write};
+use log4rs::encode::{Encode, Write as Log4rsWrite};
 use log4rs::filter::threshold::ThresholdFilter;
 use once_cell::sync::Lazy;
 use std::collections::VecDeque;
@@ -41,7 +41,7 @@ impl RedactingEncoder {
 }
 
 impl Encode for RedactingEncoder {
-    fn encode(&self, w: &mut dyn Write, record: &Record) -> anyhow::Result<()> {
+    fn encode(&self, w: &mut dyn Log4rsWrite, record: &Record) -> anyhow::Result<()> {
         let mut rendered = Vec::new();
         self.inner.encode(&mut SimpleWriter(&mut rendered), record)?;
         let line = String::from_utf8_lossy(&rendered);

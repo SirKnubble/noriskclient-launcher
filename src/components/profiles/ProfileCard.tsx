@@ -10,7 +10,7 @@ import { useThemeStore } from "../../store/useThemeStore";
 import { toast } from "react-hot-toast";
 import { ProfileContextMenu } from "./ProfileContextMenu";
 import * as ProfileService from "../../services/profile-service";
-import { LaunchButton } from "../ui/buttons/LaunchButton";
+import { IconButton } from "../ui/buttons/IconButton";
 import { Card } from "../ui/Card";
 import { useNavigate } from "react-router-dom";
 import { ProfileIcon } from "./ProfileIcon";
@@ -43,6 +43,8 @@ export function ProfileCard({
 }: ProfileCardProps) {
   const { t } = useTranslation();
   const accentColor = useThemeStore((state) => state.accentColor);
+  const uiStylePreset = useThemeStore((state) => state.uiStylePreset);
+  const isFullRiskStyle = uiStylePreset === "fullrisk";
   const navigate = useNavigate();
 
   const [isCloning, setIsCloning] = useState(false);
@@ -62,7 +64,9 @@ export function ProfileCard({
   });
 
   const { getProfileState, initializeProfile } = useLaunchStateStore();
-  const { isButtonLaunching, buttonStatusMessage } = getProfileState(profile.id);
+  const { isButtonLaunching, buttonStatusMessage } = getProfileState(
+    profile.id,
+  );
 
   useEffect(() => {
     initializeProfile(profile.id);
@@ -140,7 +144,7 @@ export function ProfileCard({
   const handleClone = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!profile.id) {
-      toast.error(t('profiles.errors.id_missing_clone'));
+      toast.error(t("profiles.errors.id_missing_clone"));
       return;
     }
     try {
@@ -177,7 +181,7 @@ export function ProfileCard({
       }
     } catch (err) {
       console.error("Error in clone setup or dialog: ", err);
-      toast.error(t('profiles.errors.clone_failed'));
+      toast.error(t("profiles.errors.clone_failed"));
       setIsCloning(false);
     }
   };
@@ -269,7 +273,9 @@ export function ProfileCard({
   };
 
   const handleCreateDesktopShortcut = () => {
-    const shortcutPromise = ProfileService.createProfileDesktopShortcut(profile.id);
+    const shortcutPromise = ProfileService.createProfileDesktopShortcut(
+      profile.id,
+    );
     toast.promise(shortcutPromise, {
       loading: `Creating desktop shortcut for '${profile.name}'...`,
       success: "Desktop shortcut created",
@@ -279,7 +285,7 @@ export function ProfileCard({
 
   const handleRepairFromContextMenu = async () => {
     if (!profile?.id) {
-      toast.error(t('profiles.errors.id_missing_repair'));
+      toast.error(t("profiles.errors.id_missing_repair"));
       return;
     }
 
@@ -329,8 +335,9 @@ export function ProfileCard({
             "p-4 flex flex-col gap-3 relative overflow-hidden",
             "transition-all duration-300 ease-out hover:scale-[1.02]",
             isCloning && "pointer-events-none",
+            isFullRiskStyle && "fullrisk-panel",
           )}
-          variant="flat"
+          variant={isFullRiskStyle ? "3d" : "flat"}
           withAnimation={false}
         >
           {/* Background image overlay */}
@@ -367,48 +374,60 @@ export function ProfileCard({
                 placeholderIcon="ph:package-duotone"
                 iconClassName="w-10 h-10"
               />
-              {!isCloning &&
-                (isButtonLaunching || isCardHovered) && (
-                  <div
-                    className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-150 cursor-pointer rounded-lg"
-                    onClick={
-                      interactionMode === "settings"
-                        ? handleSettingsClick
-                        : undefined
-                    }
-                    aria-label={
-                      interactionMode === "settings"
-                        ? `Settings for ${profile.name}`
-                        : undefined
-                    }
-                    role={interactionMode === "settings" ? "button" : undefined}
-                    tabIndex={interactionMode === "settings" ? 0 : undefined}
-                    onKeyDown={
-                      interactionMode === "settings"
-                        ? (e) => {
-                            if (e.key === "Enter" || e.key === " ")
-                              handleSettingsClick(e as any);
+              {!isCloning && (isButtonLaunching || isCardHovered) && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-150 cursor-pointer rounded-lg"
+                  onClick={
+                    interactionMode === "settings"
+                      ? handleSettingsClick
+                      : undefined
+                  }
+                  aria-label={
+                    interactionMode === "settings"
+                      ? `Settings for ${profile.name}`
+                      : undefined
+                  }
+                  role={interactionMode === "settings" ? "button" : undefined}
+                  tabIndex={interactionMode === "settings" ? 0 : undefined}
+                  onKeyDown={
+                    interactionMode === "settings"
+                      ? (e) => {
+                          if (e.key === "Enter" || e.key === " ")
+                            handleSettingsClick(e as any);
+                        }
+                      : undefined
+                  }
+                >
+                  {interactionMode === "launch" ? (
+                    <IconButton
+                      icon={
+                        <Icon
+                          icon={
+                            isButtonLaunching
+                              ? "solar:refresh-bold"
+                              : "solar:play-bold"
                           }
-                        : undefined
-                    }
-                  >
-                    {interactionMode === "launch" ? (
-                      <LaunchButton
-                        id={profile.id}
-                        name={profile.name}
-                        isIconOnly={true}
-                        disabled={isCloning}
-                        forceDisplaySpinner={isButtonLaunching}
-                        className="text-white"
-                      />
-                    ) : (
-                      <Icon
-                        icon="solar:settings-bold"
-                        className="w-12 h-12 text-white hover:text-white/80 transition-colors"
-                      />
-                    )}
-                  </div>
-                )}
+                          className="w-6 h-6"
+                        />
+                      }
+                      variant="3d"
+                      size="lg"
+                      disabled={isCloning}
+                      className="text-white"
+                      aria-label={
+                        isButtonLaunching
+                          ? `Launching ${profile.name}`
+                          : `Launch ${profile.name}`
+                      }
+                    />
+                  ) : (
+                    <Icon
+                      icon="solar:settings-bold"
+                      className="w-12 h-12 text-white hover:text-white/80 transition-colors"
+                    />
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex-grow min-w-0 mr-auto pr-2 max-w-[calc(100%-80px)]">
@@ -422,27 +441,28 @@ export function ProfileCard({
                 className="flex items-center gap-2 text-white/60 mt-1 font-minecraft-ten text-xs whitespace-nowrap overflow-hidden text-ellipsis h-5 max-w-full"
                 title={
                   isCloning
-                    ? t('profiles.cloning')
+                    ? t("profiles.cloning")
                     : isButtonLaunching
-                      ? buttonStatusMessage || t('profiles.starting')
-                      : `${profile.loader || t('common.vanilla')} - ${profile.game_version}`
+                      ? buttonStatusMessage || t("profiles.starting")
+                      : `${profile.loader || t("common.vanilla")} - ${profile.game_version}`
                 }
               >
                 {isCloning ? (
-                  <span className="opacity-70">{t('profiles.cloning')}</span>
+                  <span className="opacity-70">{t("profiles.cloning")}</span>
                 ) : isButtonLaunching ? (
                   <span className="opacity-70">
-                    {buttonStatusMessage || t('profiles.starting')}
+                    {buttonStatusMessage || t("profiles.starting")}
                   </span>
                 ) : (
                   <>
                     <img
                       src={getModLoaderIcon() || "/placeholder.svg"}
-                      alt={profile.loader || t('common.vanilla')}
+                      alt={profile.loader || t("common.vanilla")}
                       className="w-4 h-4 object-contain"
                     />
                     <span>
-                      {profile.loader || t('common.vanilla')} {profile.game_version}
+                      {profile.loader || t("common.vanilla")}{" "}
+                      {profile.game_version}
                     </span>
                   </>
                 )}

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { invoke } from "@tauri-apps/api/core";
 import { GroupTabs, type GroupTab } from "../ui/GroupTabs";
-import { invoke } from "@tauri-apps/api/core";
 import { toast } from "react-hot-toast";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { useTranslation } from "react-i18next";

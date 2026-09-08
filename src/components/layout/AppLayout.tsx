@@ -57,7 +57,6 @@ import { ColorPicker } from "../ColorPicker";
 import { RangeSlider } from ".././ui/RangeSlider";
 import { Button } from "../ui/buttons/Button";
 import { ThemeSelector } from "../ThemeSelector";
-import { parseErrorMessage } from "../../utils/error-utils";
 
 const appConfig = {
   version: "v0.5.22",
@@ -90,25 +89,6 @@ export function AppLayout({
     Boolean(customMediaUrl) && (!customMediaOnlyOnPlay || activeTab === "play");
   const shouldShowEffects = !(isCustomMediaVisible && customMediaHideEffects);
 
-  const navItems = [
-    { id: "play", icon: "solar:play-bold", label: t("nav.play") },
-    { id: "profiles", icon: "solar:user-id-bold", label: t("nav.profiles") },
-    { id: "mods", icon: "solar:widget-bold", label: t("nav.mods") },
-    {
-      id: "skins",
-      icon: "solar:emoji-funny-circle-bold",
-      label: t("nav.skins"),
-    },
-    { id: "capes", icon: "solar:shop-bold", label: t("nav.capes") },
-    // DISABLED: Advent Calendar (seasonal feature)
-    // { id: "advent-calendar", icon: "solar:gift-bold", label: t("nav.advent") },
-    {
-      id: "settings",
-      icon: "solar:settings-bold",
-      label: t("nav.settings"),
-      isAction: true,
-    },
-  ];
   const { qualityLevel } = useQualitySettingsStore();
   const {
     isBackgroundAnimationEnabled,
@@ -913,11 +893,7 @@ function HeaderBar({ minimizeRef, maximizeRef, closeRef }: HeaderBarProps) {
         <div className="flex flex-col items-start">
           <div className="flex items-center gap-3">
             <h1
-              className={
-                isFullRiskStyle
-                  ? "font-smallcaps text-[34px] tracking-wider font-bold lowercase text-shadow"
-                  : "font-smallcaps text-2xl tracking-wider font-bold lowercase text-shadow"
-              }
+              className="font-smallcaps text-2xl tracking-wider font-bold lowercase text-shadow"
               data-tauri-drag-region
             >
               {isFullRiskStyle ? "fullriskclient" : "noriskclient"}

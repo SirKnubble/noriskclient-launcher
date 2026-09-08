@@ -29,7 +29,10 @@ import { usePlayerAvatar } from "../../hooks/usePlayerAvatar";
 import { parseMotdToHtml } from "../../utils/motd-utils";
 import { useTranslation } from "react-i18next";
 import { usePinnedProfilesStore } from "../../store/usePinnedProfilesStore";
-import { createProfileDesktopShortcut, resolveImagePath } from "../../services/profile-service";
+import {
+  createProfileDesktopShortcut,
+  resolveImagePath,
+} from "../../services/profile-service";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { shareProfile } from "../../services/profile-share-service";
 
@@ -128,8 +131,8 @@ export function ProfileCardV2({
     uuid: preferredAccount?.id,
     overlay: true,
   });
-  const estimatedContextMenuHeight =
-    profile.modpack_info?.source && modpackVersions ? 289 : 245;
+  const hasModpackSource = Boolean(profile.modpack_info?.source);
+  const estimatedContextMenuHeight = hasModpackSource ? 289 : 245;
 
   const calculateContextMenuPosition = useCallback(
     (
@@ -347,7 +350,7 @@ export function ProfileCardV2({
     {
       id: "desktop-shortcut",
       label: "Shortcut to Desktop",
-      icon: "solar:shortcut-bold",
+      icon: "solar:link-bold",
       onClick: async (profile) => {
         await toast.promise(createProfileDesktopShortcut(profile.id), {
           loading: "Creating desktop shortcut...",
@@ -397,7 +400,6 @@ export function ProfileCardV2({
       setIsContextMenuOpen(false);
     }
   }, [openContextMenuId, contextMenuId, isContextMenuOpen]);
-
 
   // Fetch resolved loader version
   useEffect(() => {
@@ -539,7 +541,7 @@ export function ProfileCardV2({
   const actionButtons: ProfileActionButton[] = [
     {
       id: "play",
-      label: isLaunching ? t('profiles.stop') : t('profiles.play'),
+      label: isLaunching ? t("profiles.stop") : t("profiles.play"),
       icon: isLaunching ? "solar:stop-bold" : "solar:play-bold",
       variant: isLaunching ? "destructive" : "primary",
       tooltip: isLaunching
@@ -747,7 +749,11 @@ export function ProfileCardV2({
               className={isCompact ? "w-3 h-3" : "w-4 h-4"}
             />
             {variant === "3d" && (
-              <span className={`font-minecraft ${isCompact ? 'text-xs' : 'text-sm'} uppercase`}>MODS</span>
+              <span
+                className={`font-minecraft ${isCompact ? "text-xs" : "text-sm"} uppercase`}
+              >
+                MODS
+              </span>
             )}
           </button>
         </div>
@@ -799,8 +805,8 @@ export function ProfileCardV2({
           >
             <div className="flex items-center gap-2 mb-0.5">
               <h3
-                className={`font-minecraft text-white ${isCompact ? 'text-base' : 'text-lg'} whitespace-nowrap overflow-hidden text-ellipsis normal-case`}
-                style={{ textShadow: '0 2px 4px rgba(0,0,0,0.7)' }}
+                className={`font-minecraft text-white ${isCompact ? "text-base" : "text-lg"} whitespace-nowrap overflow-hidden text-ellipsis normal-case`}
+                style={{ textShadow: "0 2px 4px rgba(0,0,0,0.7)" }}
                 title={profile.name}
               >
                 <span
@@ -840,7 +846,7 @@ export function ProfileCardV2({
                         className={`${isCompact ? "w-4 h-4" : "w-5 h-5"} rounded-sm pixelated flex-shrink-0`}
                         style={{ imageRendering: "pixelated" }}
                         onError={(e) => {
-                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.style.display = "none";
                         }}
                       />
                     )}
@@ -856,69 +862,72 @@ export function ProfileCardV2({
             {isLaunching ? (
               <div
                 className="text-white/60 text-xs font-minecraft opacity-70 whitespace-nowrap overflow-hidden text-ellipsis max-w-full"
-                style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+                style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}
               >
                 {statusMessage || t("profiles.card.starting")}
               </div>
-            ) : (
-              isCompact ? (
-                 // Compact mode: Only MC version + last played
-                 <div className="flex items-center gap-1.5 text-xs font-minecraft" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-                   {/* Minecraft Version */}
-                   <div className="text-white/70 flex items-center gap-0.5">
-                     <img
-                       src="/icons/minecraft.png"
-                       alt="Minecraft"
-                       className="w-2.5 h-2.5 object-contain"
-                     />
-                     <span>{profile.game_version}</span>
-                   </div>
+            ) : isCompact ? (
+              // Compact mode: Only MC version + last played
+              <div
+                className="flex items-center gap-1.5 text-xs font-minecraft"
+                style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}
+              >
+                {/* Minecraft Version */}
+                <div className="text-white/70 flex items-center gap-0.5">
+                  <img
+                    src="/icons/minecraft.png"
+                    alt="Minecraft"
+                    className="w-2.5 h-2.5 object-contain"
+                  />
+                  <span>{profile.game_version}</span>
+                </div>
 
                 <div className="w-px h-2.5 bg-white/30"></div>
 
-                   {/* Last Played */}
-                   <div className="text-white/50">
-                     {formatLastPlayed(profile.last_played)}
-                   </div>
-                 </div>
-               ) : (
-                 // Grid mode: Full info display
-                 <div className="flex items-center gap-2 text-xs font-minecraft" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-                   {/* Minecraft Version */}
-                   <div className="text-white/70 flex items-center gap-1">
-                     <img
-                       src="/icons/minecraft.png"
-                       alt="Minecraft"
-                       className="w-3 h-3 object-contain"
-                     />
-                     <span>{profile.game_version}</span>
-                   </div>
-                   
-                   <div className="w-px h-3 bg-white/30"></div>
-                   
-                   {/* Loader Version */}
-                   <div className="text-white/60 flex items-center gap-1">
-                     <img
-                       src={getModLoaderIcon()}
-                       alt={profile.loader || t('common.vanilla')}
-                       className="w-3 h-3 object-contain"
-                     />
-                     <span>
-                       {profile.loader === "vanilla" 
-                         ? "Vanilla" 
-                         : `${resolvedLoaderVersion?.version || profile.loader_version || "Unknown"}`
-                       }
-                     </span>
-                   </div>
-                   
-                   <div className="w-px h-3 bg-white/30"></div>
-                   
-                   {/* Last Played */}
-                   <div className="text-white/50">
-                     {formatLastPlayed(profile.last_played)}
-                   </div>
-                 </div>
-               )
+                {/* Last Played */}
+                <div className="text-white/50">
+                  {formatLastPlayed(profile.last_played)}
+                </div>
+              </div>
+            ) : (
+              // Grid mode: Full info display
+              <div
+                className="flex items-center gap-2 text-xs font-minecraft"
+                style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}
+              >
+                {/* Minecraft Version */}
+                <div className="text-white/70 flex items-center gap-1">
+                  <img
+                    src="/icons/minecraft.png"
+                    alt="Minecraft"
+                    className="w-3 h-3 object-contain"
+                  />
+                  <span>{profile.game_version}</span>
+                </div>
+
+                <div className="w-px h-3 bg-white/30"></div>
+
+                {/* Loader Version */}
+                <div className="text-white/60 flex items-center gap-1">
+                  <img
+                    src={getModLoaderIcon()}
+                    alt={profile.loader || t("common.vanilla")}
+                    className="w-3 h-3 object-contain"
+                  />
+                  <span>
+                    {profile.loader === "vanilla"
+                      ? "Vanilla"
+                      : `${resolvedLoaderVersion?.version || profile.loader_version || "Unknown"}`}
+                  </span>
+                </div>
+
+                <div className="w-px h-3 bg-white/30"></div>
+
+                {/* Last Played */}
+                <div className="text-white/50">
+                  {formatLastPlayed(profile.last_played)}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -1012,7 +1021,7 @@ export function ProfileCardV2({
         <div className="flex items-center gap-2 mb-1">
           <h3
             className="text-white font-minecraft text-sm whitespace-nowrap overflow-hidden text-ellipsis normal-case"
-            style={{ textShadow: '0 2px 4px rgba(0,0,0,0.7)' }}
+            style={{ textShadow: "0 2px 4px rgba(0,0,0,0.7)" }}
             title={profile.name}
           >
             <span
@@ -1052,7 +1061,7 @@ export function ProfileCardV2({
                     className="w-5 h-5 rounded-sm pixelated flex-shrink-0"
                     style={{ imageRendering: "pixelated" }}
                     onError={(e) => {
-                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.style.display = "none";
                     }}
                   />
                 )}
@@ -1067,46 +1076,48 @@ export function ProfileCardV2({
         {isLaunching ? (
           <div
             className="text-white/60 text-xs font-minecraft opacity-70 whitespace-nowrap overflow-hidden text-ellipsis max-w-full"
-            style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+            style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}
           >
             {statusMessage || t("profiles.card.starting")}
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-xs font-minecraft" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-          {/* Minecraft Version */}
-          <div className="text-white/70 flex items-center gap-1">
-            <img
-              src="/icons/minecraft.png"
-              alt="Minecraft"
-              className="w-3 h-3 object-contain"
-            />
-            <span>{profile.game_version}</span>
+          <div
+            className="flex items-center gap-2 text-xs font-minecraft"
+            style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}
+          >
+            {/* Minecraft Version */}
+            <div className="text-white/70 flex items-center gap-1">
+              <img
+                src="/icons/minecraft.png"
+                alt="Minecraft"
+                className="w-3 h-3 object-contain"
+              />
+              <span>{profile.game_version}</span>
+            </div>
+
+            <div className="w-px h-3 bg-white/30"></div>
+
+            {/* Loader Version */}
+            <div className="text-white/60 flex items-center gap-1">
+              <img
+                src={getModLoaderIcon()}
+                alt={profile.loader || t("common.vanilla")}
+                className="w-3 h-3 object-contain"
+              />
+              <span>
+                {profile.loader === "vanilla"
+                  ? t("common.vanilla")
+                  : `${resolvedLoaderVersion?.version || profile.loader_version || t("common.unknown")}`}
+              </span>
+            </div>
+
+            <div className="w-px h-3 bg-white/30"></div>
+
+            {/* Last Played */}
+            <div className="text-white/50">
+              {formatLastPlayed(profile.last_played)}
+            </div>
           </div>
-          
-          <div className="w-px h-3 bg-white/30"></div>
-          
-          {/* Loader Version */}
-          <div className="text-white/60 flex items-center gap-1">
-            <img
-              src={getModLoaderIcon()}
-              alt={profile.loader || t('common.vanilla')}
-              className="w-3 h-3 object-contain"
-            />
-            <span>
-              {profile.loader === "vanilla"
-                ? t('common.vanilla')
-                : `${resolvedLoaderVersion?.version || profile.loader_version || t('common.unknown')}`
-              }
-            </span>
-          </div>
-          
-          <div className="w-px h-3 bg-white/30"></div>
-          
-          {/* Last Played */}
-          <div className="text-white/50">
-            {formatLastPlayed(profile.last_played)}
-          </div>
-        </div>
         )}
       </div>
 

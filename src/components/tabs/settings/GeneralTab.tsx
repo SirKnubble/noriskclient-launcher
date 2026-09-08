@@ -23,8 +23,16 @@ export function GeneralTab() {
   const { t } = useTranslation();
   const kw = useSettingsKeywords();
   const { config, tempConfig, setTempConfig, saving } = useSettingsConfig();
-  const { language, setLanguage, accentColor, borderRadius, setBorderRadius, setAnalyticsConsent } =
-    useThemeStore();
+  const {
+    language,
+    setLanguage,
+    accentColor,
+    borderRadius,
+    setBorderRadius,
+    setAnalyticsConsent,
+    uiStylePreset,
+    setUIStylePreset,
+  } = useThemeStore();
   const { showModal, hideModal } = useGlobalModal();
   const { isThemeActive } = useLauncherTheme();
   const isAccentColorDisabled = isThemeActive;
@@ -35,10 +43,12 @@ export function GeneralTab() {
     !!config?.is_experimental;
 
   const handleConcurrentDownloadsChange = (value: number) => {
-    if (tempConfig) setTempConfig({ ...tempConfig, concurrent_downloads: value });
+    if (tempConfig)
+      setTempConfig({ ...tempConfig, concurrent_downloads: value });
   };
   const handleConcurrentIoLimitChange = (value: number) => {
-    if (tempConfig) setTempConfig({ ...tempConfig, concurrent_io_limit: value });
+    if (tempConfig)
+      setTempConfig({ ...tempConfig, concurrent_io_limit: value });
   };
 
   return (
@@ -50,7 +60,10 @@ export function GeneralTab() {
         keywords={kw("settings.language", "sprache", "language", "locale")}
         description={t("settings.language.description")}
       >
-        <SettingRow label={t("settings.language")} searchKeywords={kw("settings.language", "sprache", "locale")}>
+        <SettingRow
+          label={t("settings.language")}
+          searchKeywords={kw("settings.language", "sprache", "locale")}
+        >
           <div className="w-56">
             <Select
               value={language}
@@ -68,31 +81,100 @@ export function GeneralTab() {
       </SettingsSection>
 
       <SettingsSection
+        id="settings-section-launcher-style"
+        title="Launcher Style"
+        icon="solar:magic-stick-3-bold"
+        keywords={kw(
+          "launcher style",
+          "fullrisk",
+          "theme style",
+          "style",
+          "ui style",
+          "interface style",
+        )}
+      >
+        <SettingRow
+          label="Launcher Style"
+          description="Choose the launcher look and layout style."
+          searchKeywords={kw(
+            "launcher style",
+            "fullrisk",
+            "theme style",
+            "style",
+            "ui style",
+          )}
+        >
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {[
+              { id: "default", label: "Default" },
+              { id: "fullrisk", label: "FullRisk" },
+            ].map((option) => {
+              const isSelected = uiStylePreset === option.id;
+
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() =>
+                    setUIStylePreset(option.id as "default" | "fullrisk")
+                  }
+                  className={cn(
+                    "min-w-[96px] rounded-lg border px-3 py-1.5 text-[11px] font-minecraft leading-none transition-all duration-150",
+                    isSelected
+                      ? "border-white/60 bg-white/10 text-white shadow-inner"
+                      : "border-white/20 bg-black/20 text-white/60 hover:border-white/35 hover:text-white",
+                  )}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </SettingRow>
+      </SettingsSection>
+
+      <SettingsSection
         id="settings-section-accent"
         title={t("settings.accent_color.title")}
         icon="solar:palette-bold"
-        keywords={kw("settings.accent_color.title", "color", "colour", "farbe", "akzent", "accent", "theme")}
+        keywords={kw(
+          "settings.accent_color.title",
+          "color",
+          "colour",
+          "farbe",
+          "akzent",
+          "accent",
+          "theme",
+        )}
         description={
           <>
             {t("settings.accent_color.description")}
             {isThemeActive && (
-              <span className="text-white/50 ml-2">{t("settings.accent_color.disabled_theme")}</span>
+              <span className="text-white/50 ml-2">
+                {t("settings.accent_color.disabled_theme")}
+              </span>
             )}
           </>
         }
       >
         <div className="flex items-center gap-6 py-3">
           <div className="flex-1">
-            <ColorPicker shape="square" size="md" showCustomOption={false} disabled={isAccentColorDisabled} />
+            <ColorPicker
+              shape="square"
+              size="md"
+              showCustomOption={false}
+              disabled={isAccentColorDisabled}
+            />
           </div>
 
           <button
             onClick={() => {
               if (!isAccentColorDisabled) {
-                showModal('color-picker-modal',
+                showModal(
+                  "color-picker-modal",
                   <ColorPickerModal
-                    onClose={() => hideModal('color-picker-modal')}
-                  />
+                    onClose={() => hideModal("color-picker-modal")}
+                  />,
                 );
               }
             }}
@@ -100,9 +182,13 @@ export function GeneralTab() {
               "group flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-dashed border-[#ffffff30] transition-all duration-200",
               isAccentColorDisabled
                 ? "opacity-40 cursor-not-allowed"
-                : "hover:border-[#ffffff50] cursor-pointer"
+                : "hover:border-[#ffffff50] cursor-pointer",
             )}
-            title={isAccentColorDisabled ? t("settings.accent_color.custom_tooltip_disabled") : t("settings.accent_color.custom_tooltip")}
+            title={
+              isAccentColorDisabled
+                ? t("settings.accent_color.custom_tooltip_disabled")
+                : t("settings.accent_color.custom_tooltip")
+            }
             disabled={isAccentColorDisabled}
           >
             <div
@@ -125,16 +211,34 @@ export function GeneralTab() {
         </div>
       </SettingsSection>
 
-      <SettingsSection id="settings-section-behaviour" title={t("settings.sections.behaviour")} icon="solar:tuning-2-bold" keywords={kw("settings.sections.behaviour", "behaviour", "behavior", "verhalten")}>
+      <SettingsSection
+        id="settings-section-behaviour"
+        title={t("settings.sections.behaviour")}
+        icon="solar:tuning-2-bold"
+        keywords={kw(
+          "settings.sections.behaviour",
+          "behaviour",
+          "behavior",
+          "verhalten",
+        )}
+      >
         <SettingRow
           label={t("settings.auto_updates")}
           description={t("settings.auto_updates.tooltip")}
-          searchKeywords={kw("settings.auto_updates", "update", "updates", "aktualisierung")}
+          searchKeywords={kw(
+            "settings.auto_updates",
+            "update",
+            "updates",
+            "aktualisierung",
+          )}
           disabled={saving}
         >
           <ToggleSwitch
             checked={tempConfig?.auto_check_updates || false}
-            onChange={(checked) => tempConfig && setTempConfig({ ...tempConfig, auto_check_updates: checked })}
+            onChange={(checked) =>
+              tempConfig &&
+              setTempConfig({ ...tempConfig, auto_check_updates: checked })
+            }
             disabled={saving}
             size="md"
           />
@@ -142,12 +246,21 @@ export function GeneralTab() {
         <SettingRow
           label={t("settings.discord_presence")}
           description={t("settings.discord_presence.tooltip")}
-          searchKeywords={kw("settings.discord_presence", "discord", "presence", "status", "rich")}
+          searchKeywords={kw(
+            "settings.discord_presence",
+            "discord",
+            "presence",
+            "status",
+            "rich",
+          )}
           disabled={saving}
         >
           <ToggleSwitch
             checked={tempConfig?.enable_discord_presence || false}
-            onChange={(checked) => tempConfig && setTempConfig({ ...tempConfig, enable_discord_presence: checked })}
+            onChange={(checked) =>
+              tempConfig &&
+              setTempConfig({ ...tempConfig, enable_discord_presence: checked })
+            }
             disabled={saving}
             size="md"
           />
@@ -155,12 +268,21 @@ export function GeneralTab() {
         <SettingRow
           label={t("settings.beta_updates")}
           description={t("settings.beta_updates.tooltip")}
-          searchKeywords={kw("settings.beta_updates", "beta", "update", "channel", "kanal")}
+          searchKeywords={kw(
+            "settings.beta_updates",
+            "beta",
+            "update",
+            "channel",
+            "kanal",
+          )}
           disabled={saving}
         >
           <ToggleSwitch
             checked={tempConfig?.check_beta_channel || false}
-            onChange={(checked) => tempConfig && setTempConfig({ ...tempConfig, check_beta_channel: checked })}
+            onChange={(checked) =>
+              tempConfig &&
+              setTempConfig({ ...tempConfig, check_beta_channel: checked })
+            }
             disabled={saving}
             size="md"
           />
@@ -169,12 +291,20 @@ export function GeneralTab() {
           <SettingRow
             label={t("settings.experimental_mode")}
             description={t("settings.experimental_mode.tooltip")}
-            searchKeywords={kw("settings.experimental_mode", "experimental", "experimentell", "beta")}
+            searchKeywords={kw(
+              "settings.experimental_mode",
+              "experimental",
+              "experimentell",
+              "beta",
+            )}
             disabled={saving}
           >
             <ToggleSwitch
               checked={tempConfig?.is_experimental || false}
-              onChange={(checked) => tempConfig && setTempConfig({ ...tempConfig, is_experimental: checked })}
+              onChange={(checked) =>
+                tempConfig &&
+                setTempConfig({ ...tempConfig, is_experimental: checked })
+              }
               disabled={saving}
               size="md"
             />
@@ -188,7 +318,13 @@ export function GeneralTab() {
         >
           <ToggleSwitch
             checked={tempConfig?.open_logs_after_starting || false}
-            onChange={(checked) => tempConfig && setTempConfig({ ...tempConfig, open_logs_after_starting: checked })}
+            onChange={(checked) =>
+              tempConfig &&
+              setTempConfig({
+                ...tempConfig,
+                open_logs_after_starting: checked,
+              })
+            }
             disabled={saving}
             size="md"
           />
@@ -196,12 +332,22 @@ export function GeneralTab() {
         <SettingRow
           label={t("settings.hide_window")}
           description={t("settings.hide_window.tooltip")}
-          searchKeywords={kw("settings.hide_window", "window", "fenster", "hide", "verstecken", "minimize")}
+          searchKeywords={kw(
+            "settings.hide_window",
+            "window",
+            "fenster",
+            "hide",
+            "verstecken",
+            "minimize",
+          )}
           disabled={saving}
         >
           <ToggleSwitch
             checked={tempConfig?.hide_on_process_start || false}
-            onChange={(checked) => tempConfig && setTempConfig({ ...tempConfig, hide_on_process_start: checked })}
+            onChange={(checked) =>
+              tempConfig &&
+              setTempConfig({ ...tempConfig, hide_on_process_start: checked })
+            }
             disabled={saving}
             size="md"
           />
@@ -209,7 +355,14 @@ export function GeneralTab() {
         <SettingRow
           label={t("analytics.settings.label")}
           description={t("analytics.settings.tooltip")}
-          searchKeywords={kw("analytics.settings.label", "analytics", "analyse", "telemetry", "telemetrie", "tracking")}
+          searchKeywords={kw(
+            "analytics.settings.label",
+            "analytics",
+            "analyse",
+            "telemetry",
+            "telemetrie",
+            "tracking",
+          )}
           disabled={saving}
         >
           <ToggleSwitch
@@ -219,7 +372,7 @@ export function GeneralTab() {
                 setTempConfig({ ...tempConfig, enable_analytics: checked });
                 setAnalyticsConsent({
                   hasMadeDecision: true,
-                  decision: checked ? 'accepted' : 'declined',
+                  decision: checked ? "accepted" : "declined",
                 });
                 invalidateAnalyticsCache();
               }
@@ -230,11 +383,28 @@ export function GeneralTab() {
         </SettingRow>
       </SettingsSection>
 
-      <SettingsSection id="settings-section-interface" title={t("settings.sections.interface")} icon="solar:slider-horizontal-bold" keywords={kw("settings.sections.interface", "downloads", "interface", "oberfläche", "performance")}>
+      <SettingsSection
+        id="settings-section-interface"
+        title={t("settings.sections.interface")}
+        icon="solar:slider-horizontal-bold"
+        keywords={kw(
+          "settings.sections.interface",
+          "downloads",
+          "interface",
+          "oberfläche",
+          "performance",
+        )}
+      >
         <SettingRow
           label={t("settings.concurrent_downloads")}
           description={t("settings.concurrent_downloads.tooltip")}
-          searchKeywords={kw("settings.concurrent_downloads", "download", "downloads", "herunterladen", "parallel")}
+          searchKeywords={kw(
+            "settings.concurrent_downloads",
+            "download",
+            "downloads",
+            "herunterladen",
+            "parallel",
+          )}
           disabled={saving}
           vertical
         >
@@ -249,13 +419,24 @@ export function GeneralTab() {
             size="sm"
             minLabel="1"
             maxLabel="10"
-            icon={<Icon icon="solar:multiple-forward-right-bold" className="w-3 h-3" />}
+            icon={
+              <Icon
+                icon="solar:multiple-forward-right-bold"
+                className="w-3 h-3"
+              />
+            }
           />
         </SettingRow>
         <SettingRow
           label={t("settings.concurrent_io")}
           description={t("settings.concurrent_io.tooltip")}
-          searchKeywords={kw("settings.concurrent_io", "io", "disk", "parallel", "festplatte")}
+          searchKeywords={kw(
+            "settings.concurrent_io",
+            "io",
+            "disk",
+            "parallel",
+            "festplatte",
+          )}
           disabled={saving}
           vertical
         >
@@ -276,7 +457,17 @@ export function GeneralTab() {
         <SettingRow
           label={t("settings.border_radius")}
           description={t("settings.border_radius.tooltip")}
-          searchKeywords={kw("settings.border_radius", "border", "rand", "ecken", "eckenradius", "corner", "radius", "rounding", "rundung")}
+          searchKeywords={kw(
+            "settings.border_radius",
+            "border",
+            "rand",
+            "ecken",
+            "eckenradius",
+            "corner",
+            "radius",
+            "rounding",
+            "rundung",
+          )}
           disabled={saving}
           vertical
         >

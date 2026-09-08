@@ -21,7 +21,6 @@ import { useProfileLaunch } from "../../../hooks/useProfileLaunch.tsx";
 import { toast } from "react-hot-toast";
 import { revealItemInDir } from "../../../utils/opener-utils";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
-import { LaunchButton } from "../../ui/buttons/LaunchButton";
 import { GenericList } from "../../ui/GenericList";
 import { GenericListItem } from "../../ui/GenericListItem";
 import { preloadIcons } from "../../../lib/icon-utils";
@@ -49,12 +48,12 @@ const WORLDS_TAB_ICONS_TO_PRELOAD = [
   // Tag Badges (World)
   "solar:gamepad-bold-duotone",
   "solar:tuning-square-bold-duotone",
-  "solar:skull-bold",
+  "solar:danger-triangle-bold",
   "solar:lock-bold",
   "solar:tag-bold", // Also used for server version
   // Tag Badges (Server)
   "solar:users-group-rounded-bold",
-  "solar:wifi-bold",
+  "solar:home-wifi-bold",
   // Action Buttons (World)
   "solar:copy-bold",
   "solar:folder-open-bold-duotone",
@@ -97,43 +96,60 @@ export function WorldsTab({
   const allProfilesFromStore = useProfileStore((state) => state.profiles);
   const isLoadingProfilesFromStore = useProfileStore((state) => state.loading);
   const { showModal, hideModal } = useGlobalModal();
-  const { 
+  const {
     setActiveDropContext,
     registerWorldsRefreshCallback,
     unregisterWorldsRefreshCallback,
   } = useAppDragDropStore();
 
   // Profile launch hook for world/server launching
-  const { isLaunching, statusMessage, handleQuickPlayLaunch } = useProfileLaunch({
-    profileId: profile.id,
-    onLaunchSuccess: () => {
-      console.log("Profile launched successfully from WorldsTab:", profile.name);
-    },
-    onLaunchError: (error) => {
-      console.error("Profile launch error from WorldsTab:", error);
-    },
-  });
+  const { isLaunching, statusMessage, handleQuickPlayLaunch } =
+    useProfileLaunch({
+      profileId: profile.id,
+      onLaunchSuccess: () => {
+        console.log(
+          "Profile launched successfully from WorldsTab:",
+          profile.name,
+        );
+      },
+      onLaunchError: (error) => {
+        console.error("Profile launch error from WorldsTab:", error);
+      },
+    });
 
   // Handler for world/server launch with QuickPlay support
-  const handleWorldServerLaunch = useCallback(async (item: DisplayItem) => {
-    const isWorld = item.type === "world";
+  const handleWorldServerLaunch = useCallback(
+    async (item: DisplayItem) => {
+      const isWorld = item.type === "world";
 
-    if (isWorld) {
-      // Launch with specific world using QuickPlay
-      console.log(`🚀 QuickPlay Singleplayer: Launching world: ${item.folder_name}`);
-      toast.success(t('worlds.launching_world', { name: item.display_name || item.folder_name }));
-      handleQuickPlayLaunch(item.folder_name, undefined);
-    } else if (item.address) {
-      // Launch with specific server using QuickPlay
-      console.log(`🌐 QuickPlay Multiplayer: Joining server: ${item.address}`);
-      toast.success(t('worlds.joining_server', { name: item.name || item.address }));
-      handleQuickPlayLaunch(undefined, item.address);
-    } else {
-      // Regular launch as fallback
-      console.log("Regular launch fallback");
-      handleQuickPlayLaunch(undefined, undefined);
-    }
-  }, [handleQuickPlayLaunch]);
+      if (isWorld) {
+        // Launch with specific world using QuickPlay
+        console.log(
+          `🚀 QuickPlay Singleplayer: Launching world: ${item.folder_name}`,
+        );
+        toast.success(
+          t("worlds.launching_world", {
+            name: item.display_name || item.folder_name,
+          }),
+        );
+        handleQuickPlayLaunch(item.folder_name, undefined);
+      } else if (item.address) {
+        // Launch with specific server using QuickPlay
+        console.log(
+          `🌐 QuickPlay Multiplayer: Joining server: ${item.address}`,
+        );
+        toast.success(
+          t("worlds.joining_server", { name: item.name || item.address }),
+        );
+        handleQuickPlayLaunch(undefined, item.address);
+      } else {
+        // Regular launch as fallback
+        console.log("Regular launch fallback");
+        handleQuickPlayLaunch(undefined, undefined);
+      }
+    },
+    [handleQuickPlayLaunch],
+  );
 
   // --- State ---
   const [worlds, setWorlds] = useState<WorldInfo[]>([]);
@@ -247,7 +263,6 @@ export function WorldsTab({
     },
     [serverPings],
   );
-
 
   const updateDisplayItems = useCallback(
     (currentWorlds: WorldInfo[], currentServers: ServerInfo[]) => {
@@ -444,7 +459,13 @@ export function WorldsTab({
         unregisterWorldsRefreshCallback();
       }
     };
-  }, [profile, isActive, loadData, registerWorldsRefreshCallback, unregisterWorldsRefreshCallback]);
+  }, [
+    profile,
+    isActive,
+    loadData,
+    registerWorldsRefreshCallback,
+    unregisterWorldsRefreshCallback,
+  ]);
 
   useEffect(() => {
     if (profile?.id) {
@@ -459,98 +480,124 @@ export function WorldsTab({
     localSearchQuery,
   ]);
 
-  const handleOpenCopyDialog = useCallback(async (world: WorldInfo) => {
-    showModal(
-      "copy-world-dialog",
-      <CopyWorldDialog
-        isOpen={true}
-        sourceWorldName={getWorldDisplayName(world)}
-        sourceProfileId={profile.id}
-        availableProfiles={allProfilesFromStore}
-        isLoadingProfiles={isLoadingProfilesFromStore}
-        isCopying={isCopyingWorld}
-        onClose={() => {
-          hideModal("copy-world-dialog");
-          setWorldToCopy(null);
-        }}
-        onConfirm={async (params) => {
-          setIsCopyingWorld(true);
-          setCopyWorldError(null);
-
-          const copyParams = {
-            source_profile_id: profile.id,
-            source_world_folder: world.folder_name,
-            target_profile_id: params.targetProfileId,
-            target_world_name: params.targetWorldName,
-          };
-
-          try {
-            await WorldService.copyWorld(copyParams);
-            toast.success(
-              t('worlds.copy_success', { source: getWorldDisplayName(world), target: params.targetWorldName }),
-            );
-            if (params.targetProfileId === profile.id) {
-              await loadData();
-            }
+  const handleOpenCopyDialog = useCallback(
+    async (world: WorldInfo) => {
+      showModal(
+        "copy-world-dialog",
+        <CopyWorldDialog
+          isOpen={true}
+          sourceWorldName={getWorldDisplayName(world)}
+          sourceProfileId={profile.id}
+          availableProfiles={allProfilesFromStore}
+          isLoadingProfiles={isLoadingProfilesFromStore}
+          isCopying={isCopyingWorld}
+          onClose={() => {
             hideModal("copy-world-dialog");
             setWorldToCopy(null);
-          } catch (err) {
-            console.error("Failed to copy world:", err);
-            const errorMsg = parseErrorMessage(err);
-            setCopyWorldError(t('worlds.copy_failed', { error: errorMsg }));
-            toast.error(t('worlds.copy_failed', { error: errorMsg }));
-          } finally {
-            setIsCopyingWorld(false);
-          }
-        }}
-        initialError={copyWorldError}
-      />
-    );
-    setWorldToCopy(world);
-    setCopyWorldError(null);
-  }, [showModal, hideModal, getWorldDisplayName, profile.id, allProfilesFromStore, isLoadingProfilesFromStore, isCopyingWorld, copyWorldError, loadData]);
+          }}
+          onConfirm={async (params) => {
+            setIsCopyingWorld(true);
+            setCopyWorldError(null);
 
+            const copyParams = {
+              source_profile_id: profile.id,
+              source_world_folder: world.folder_name,
+              target_profile_id: params.targetProfileId,
+              target_world_name: params.targetWorldName,
+            };
 
+            try {
+              await WorldService.copyWorld(copyParams);
+              toast.success(
+                t("worlds.copy_success", {
+                  source: getWorldDisplayName(world),
+                  target: params.targetWorldName,
+                }),
+              );
+              if (params.targetProfileId === profile.id) {
+                await loadData();
+              }
+              hideModal("copy-world-dialog");
+              setWorldToCopy(null);
+            } catch (err) {
+              console.error("Failed to copy world:", err);
+              const errorMsg = parseErrorMessage(err);
+              setCopyWorldError(t("worlds.copy_failed", { error: errorMsg }));
+              toast.error(t("worlds.copy_failed", { error: errorMsg }));
+            } finally {
+              setIsCopyingWorld(false);
+            }
+          }}
+          initialError={copyWorldError}
+        />,
+      );
+      setWorldToCopy(world);
+      setCopyWorldError(null);
+    },
+    [
+      showModal,
+      hideModal,
+      getWorldDisplayName,
+      profile.id,
+      allProfilesFromStore,
+      isLoadingProfilesFromStore,
+      isCopyingWorld,
+      copyWorldError,
+      loadData,
+    ],
+  );
 
-  const handleDeleteRequest = useCallback((world: WorldInfo) => {
-    showModal(
-      "delete-world-dialog",
-      <ConfirmDeleteDialog
-        isOpen={true}
-        itemName={getWorldDisplayName(world)}
-        onClose={() => {
-          hideModal("delete-world-dialog");
-          setWorldToDelete(null);
-        }}
-        onConfirm={async () => {
-          setIsActuallyDeleting(true);
-          try {
-            await WorldService.deleteWorld(profile.id, world.folder_name);
-            toast.success(t('worlds.delete_success', { name: getWorldDisplayName(world) }));
+  const handleDeleteRequest = useCallback(
+    (world: WorldInfo) => {
+      showModal(
+        "delete-world-dialog",
+        <ConfirmDeleteDialog
+          isOpen={true}
+          itemName={getWorldDisplayName(world)}
+          onClose={() => {
             hideModal("delete-world-dialog");
             setWorldToDelete(null);
-            await loadData();
-          } catch (err) {
-            console.error("Delete failed:", err);
-            toast.error(
-              t('worlds.delete_failed', { error: parseErrorMessage(err) }),
-            );
-          } finally {
-            setIsActuallyDeleting(false);
-          }
-        }}
-        isDeleting={isActuallyDeleting}
-      />
-    );
-    setWorldToDelete(world);
-  }, [showModal, hideModal, getWorldDisplayName, profile.id, loadData, isActuallyDeleting]);
-
-
+          }}
+          onConfirm={async () => {
+            setIsActuallyDeleting(true);
+            try {
+              await WorldService.deleteWorld(profile.id, world.folder_name);
+              toast.success(
+                t("worlds.delete_success", {
+                  name: getWorldDisplayName(world),
+                }),
+              );
+              hideModal("delete-world-dialog");
+              setWorldToDelete(null);
+              await loadData();
+            } catch (err) {
+              console.error("Delete failed:", err);
+              toast.error(
+                t("worlds.delete_failed", { error: parseErrorMessage(err) }),
+              );
+            } finally {
+              setIsActuallyDeleting(false);
+            }
+          }}
+          isDeleting={isActuallyDeleting}
+        />,
+      );
+      setWorldToDelete(world);
+    },
+    [
+      showModal,
+      hideModal,
+      getWorldDisplayName,
+      profile.id,
+      loadData,
+      isActuallyDeleting,
+    ],
+  );
 
   const handleOpenWorldFolder = useCallback(
     async (world: WorldInfo) => {
       if (!world?.icon_path) {
-        toast.error(t('worlds.path_not_available'));
+        toast.error(t("worlds.path_not_available"));
         console.error(
           "Cannot open world folder: Profile path is missing.",
           profile,
@@ -562,11 +609,13 @@ export function WorldsTab({
       try {
         console.log(`Attempting to open folder: ${worldFolderPath}`);
         await revealItemInDir(worldFolderPath);
-        toast.success(t('worlds.open_folder_success', { name: getWorldDisplayName(world) }));
+        toast.success(
+          t("worlds.open_folder_success", { name: getWorldDisplayName(world) }),
+        );
       } catch (err) {
         console.error(`Failed to open folder ${worldFolderPath}:`, err);
         toast.error(
-          t('worlds.open_folder_failed', { error: parseErrorMessage(err) }),
+          t("worlds.open_folder_failed", { error: parseErrorMessage(err) }),
         );
       }
     },
@@ -585,7 +634,7 @@ export function WorldsTab({
       const selectedPath = await openDialog({
         directory: true,
         multiple: false,
-        title: t('worlds.import_title'),
+        title: t("worlds.import_title"),
       });
 
       if (!selectedPath) {
@@ -593,42 +642,50 @@ export function WorldsTab({
       }
 
       // Handle both string and string[] (though multiple: false should return string)
-      const worldPath = typeof selectedPath === 'string' ? selectedPath : selectedPath[0];
+      const worldPath =
+        typeof selectedPath === "string" ? selectedPath : selectedPath[0];
       if (!worldPath) {
         return;
       }
 
       // Extract folder name from path for target name
       const pathParts = worldPath.split(/[/\\]/);
-      const folderName = pathParts[pathParts.length - 1] || 'Imported World';
+      const folderName = pathParts[pathParts.length - 1] || "Imported World";
 
       const operationId = `world-import-button-${Date.now()}`;
       const loadingToastId = `loading-${operationId}`;
-      toast.loading(t('worlds.importing', { name: folderName }), { id: loadingToastId });
+      toast.loading(t("worlds.importing", { name: folderName }), {
+        id: loadingToastId,
+      });
 
       try {
         const generatedFolderName = await WorldService.importWorld(
           profile.id,
           worldPath,
-          folderName
+          folderName,
         );
-        console.log(`[WorldsTab] World import SUCCESS: ${worldPath} -> ${generatedFolderName}`);
+        console.log(
+          `[WorldsTab] World import SUCCESS: ${worldPath} -> ${generatedFolderName}`,
+        );
         toast.success(
-          t('worlds.import_success', { source: folderName, target: generatedFolderName }),
-          { id: loadingToastId, duration: 4000 }
+          t("worlds.import_success", {
+            source: folderName,
+            target: generatedFolderName,
+          }),
+          { id: loadingToastId, duration: 4000 },
         );
         // Refresh the worlds list
         await loadData();
       } catch (err) {
         console.error(`[WorldsTab] World import ERROR for: ${worldPath}:`, err);
         toast.error(
-          t('worlds.import_failed', { error: parseErrorMessage(err) }),
-          { id: loadingToastId }
+          t("worlds.import_failed", { error: parseErrorMessage(err) }),
+          { id: loadingToastId },
         );
       }
     } catch (error) {
-      console.error('[WorldsTab] Failed to open folder picker:', error);
-      toast.error(t('worlds.folder_picker_failed'));
+      console.error("[WorldsTab] Failed to open folder picker:", error);
+      toast.error(t("worlds.folder_picker_failed"));
     }
   }, [profile.id, loadData]);
 
@@ -718,7 +775,7 @@ export function WorldsTab({
               <p className="text-white/60 text-xs truncate font-minecraft-ten">
                 {item.last_played
                   ? `Last played: ${timeAgo(item.last_played)}`
-                  : t('worlds.never_played')}
+                  : t("worlds.never_played")}
               </p>
             ) : (
               <div
@@ -726,7 +783,9 @@ export function WorldsTab({
                 title={pingInfo?.description || item.address || ""}
               >
                 {isPinging ? (
-                  <span className="italic text-white/50">{t('worlds.pinging')}</span>
+                  <span className="italic text-white/50">
+                    {t("worlds.pinging")}
+                  </span>
                 ) : hasPingError ? (
                   <span className="text-red-400 italic">
                     Error: {pingInfo?.error}
@@ -741,7 +800,7 @@ export function WorldsTab({
                   />
                 ) : (
                   <span className="italic text-white/50">
-                    {item.address || t('worlds.address_missing')}
+                    {item.address || t("worlds.address_missing")}
                   </span>
                 )}
               </div>
@@ -770,9 +829,9 @@ export function WorldsTab({
                   <TagBadge
                     variant="destructive"
                     size="sm"
-                    iconElement={<Icon icon="solar:skull-bold" />}
+                    iconElement={<Icon icon="solar:danger-triangle-bold" />}
                   >
-                    {t('worlds.hardcore')}
+                    {t("worlds.hardcore")}
                   </TagBadge>
                 )}
                 {item.difficulty_locked && (
@@ -780,7 +839,7 @@ export function WorldsTab({
                     size="sm"
                     iconElement={<Icon icon="solar:lock-bold" />}
                   >
-                    {t('worlds.locked')}
+                    {t("worlds.locked")}
                   </TagBadge>
                 )}
                 {item.version_name && (
@@ -796,11 +855,11 @@ export function WorldsTab({
               <>
                 {isPinging ? (
                   <TagBadge size="sm" variant="default">
-                    {t('worlds.pinging')}
+                    {t("worlds.pinging")}
                   </TagBadge>
                 ) : hasPingError ? (
                   <TagBadge size="sm" variant="destructive">
-                    {t('worlds.error')}
+                    {t("worlds.error")}
                   </TagBadge>
                 ) : pingInfo ? (
                   (() => {
@@ -847,7 +906,7 @@ export function WorldsTab({
                         <TagBadge
                           size="sm"
                           variant={pingLatencyVariant}
-                          iconElement={<Icon icon="solar:wifi-bold" />}
+                          iconElement={<Icon icon="solar:home-wifi-bold" />}
                         >
                           {pingInfo.latency_ms ?? "-"} ms
                         </TagBadge>
@@ -865,7 +924,7 @@ export function WorldsTab({
                   })()
                 ) : (
                   <TagBadge size="sm" variant="inactive">
-                    {t('worlds.offline_unknown')}
+                    {t("worlds.offline_unknown")}
                   </TagBadge>
                 )}
               </>
@@ -877,58 +936,86 @@ export function WorldsTab({
       const playActions = [
         {
           id: "play",
-          label: isLaunching ? t('worlds.stop') : (isWorld ? t('worlds.play') : t('worlds.join')),
-          icon: isLaunching ? "solar:stop-bold" : (isWorld ? "solar:play-bold" : "solar:login-3-bold"),
+          label: isLaunching
+            ? t("worlds.stop")
+            : isWorld
+              ? t("worlds.play")
+              : t("worlds.join"),
+          icon: isLaunching
+            ? "solar:stop-bold"
+            : isWorld
+              ? "solar:play-bold"
+              : "solar:login-3-bold",
           variant: isLaunching ? "destructive" : "secondary",
-          tooltip: isLaunching ? t('worlds.stop_launch') : (isWorld ? t('worlds.play_world') : t('worlds.join_server')),
+          tooltip: isLaunching
+            ? t("worlds.stop_launch")
+            : isWorld
+              ? t("worlds.play_world")
+              : t("worlds.join_server"),
           disabled: !isWorld && !item.address,
           onClick: () => handleWorldServerLaunch(item),
         },
       ];
 
-      const worldActions = isWorld ? [
-        {
-          id: "copy",
-          label: "",
-          icon: "solar:copy-bold",
-          tooltip: t('worlds.copy_world'),
-          disabled: isCopyingWorld,
-          onClick: () => handleOpenCopyDialog(item),
-        },
-        {
-          id: "folder",
-          label: "",
-          icon: "solar:folder-open-bold-duotone",
-          tooltip: t('worlds.open_world_folder'),
-          onClick: () => handleOpenWorldFolder(item),
-        },
-        {
-          id: "delete",
-          label: "",
-          icon: isActuallyDeleting &&
-            worldToDelete?.folder_name === item.folder_name
-            ? "solar:refresh-circle-bold-duotone"
-            : "solar:trash-bin-trash-bold",
-          tooltip: "Delete World",
-          disabled: isActuallyDeleting &&
-            worldToDelete?.folder_name === item.folder_name,
-          onClick: () => handleDeleteRequest(item),
-        },
-      ] : [];
+      const worldActions = isWorld
+        ? [
+            {
+              id: "copy",
+              label: "",
+              icon: "solar:copy-bold",
+              tooltip: t("worlds.copy_world"),
+              disabled: isCopyingWorld,
+              onClick: () => handleOpenCopyDialog(item),
+            },
+            {
+              id: "folder",
+              label: "",
+              icon: "solar:folder-open-bold-duotone",
+              tooltip: t("worlds.open_world_folder"),
+              onClick: () => handleOpenWorldFolder(item),
+            },
+            {
+              id: "delete",
+              label: "",
+              icon:
+                isActuallyDeleting &&
+                worldToDelete?.folder_name === item.folder_name
+                  ? "solar:refresh-circle-bold-duotone"
+                  : "solar:trash-bin-trash-bold",
+              tooltip: "Delete World",
+              disabled:
+                isActuallyDeleting &&
+                worldToDelete?.folder_name === item.folder_name,
+              onClick: () => handleDeleteRequest(item),
+            },
+          ]
+        : [];
 
       const actionsNode = (
         <div className="flex items-center gap-2">
           {/* Play/Join Button */}
           <ActionButton
-            icon={isLaunching ? "solar:stop-bold" : (isWorld ? "solar:play-bold" : "solar:login-3-bold")}
-            label={isLaunching ? "STOP" : (isWorld ? "PLAY" : "JOIN")}
+            icon={
+              isLaunching
+                ? "solar:stop-bold"
+                : isWorld
+                  ? "solar:play-bold"
+                  : "solar:login-3-bold"
+            }
+            label={isLaunching ? "STOP" : isWorld ? "PLAY" : "JOIN"}
             variant={isLaunching ? "destructive" : "secondary"}
             size="sm"
-            tooltip={isLaunching ? "Stop Launch" : (isWorld ? "Play World" : "Join Server")}
+            tooltip={
+              isLaunching
+                ? "Stop Launch"
+                : isWorld
+                  ? "Play World"
+                  : "Join Server"
+            }
             disabled={!isWorld && !item.address}
             onClick={() => handleWorldServerLaunch(item)}
           />
-          
+
           {/* World Actions */}
           {isWorld && (
             <>
@@ -948,18 +1035,26 @@ export function WorldsTab({
                 onClick={() => handleOpenWorldFolder(item)}
               />
               <ActionButton
-                icon={isActuallyDeleting &&
+                icon={
+                  isActuallyDeleting &&
                   worldToDelete?.folder_name === item.folder_name
-                  ? "solar:refresh-circle-bold-duotone"
-                  : "solar:trash-bin-trash-bold"}
+                    ? "solar:refresh-circle-bold-duotone"
+                    : "solar:trash-bin-trash-bold"
+                }
                 variant="icon-only"
                 size="sm"
                 tooltip="Delete World"
-                disabled={isActuallyDeleting &&
-                  worldToDelete?.folder_name === item.folder_name}
+                disabled={
+                  isActuallyDeleting &&
+                  worldToDelete?.folder_name === item.folder_name
+                }
                 onClick={() => handleDeleteRequest(item)}
-                className={isActuallyDeleting &&
-                  worldToDelete?.folder_name === item.folder_name ? "animate-spin" : ""}
+                className={
+                  isActuallyDeleting &&
+                  worldToDelete?.folder_name === item.folder_name
+                    ? "animate-spin"
+                    : ""
+                }
               />
             </>
           )}
@@ -972,19 +1067,13 @@ export function WorldsTab({
           className="relative flex items-center gap-4 p-3 rounded-lg bg-black/20 border border-white/10 hover:border-white/20 transition-all duration-200"
         >
           {/* Icon */}
-          <div className="relative w-16 h-16 flex-shrink-0">
-            {iconNode}
-          </div>
+          <div className="relative w-16 h-16 flex-shrink-0">{iconNode}</div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0">
-            {contentNode}
-          </div>
+          <div className="flex-1 min-w-0">{contentNode}</div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
-            {actionsNode}
-          </div>
+          <div className="flex items-center gap-2">{actionsNode}</div>
         </div>
       );
     },
@@ -1016,7 +1105,7 @@ export function WorldsTab({
         {/* Only show search if parent isn't providing it */}
         {!searchQuery && (
           <SearchWithFilters
-            placeholder={t('worlds.search_placeholder')}
+            placeholder={t("worlds.search_placeholder")}
             searchValue={localSearchQuery}
             onSearchChange={setLocalSearchQuery}
             showSort={false}
@@ -1028,16 +1117,20 @@ export function WorldsTab({
         <div className="flex items-center gap-4 ml-auto">
           <ActionButton
             icon="solar:folder-with-files-bold"
-            label={t('worlds.import_button')}
+            label={t("worlds.import_button")}
             variant="text"
             size="sm"
             onClick={handleImportWorld}
             disabled={loading}
-            tooltip={t('worlds.import_title')}
+            tooltip={t("worlds.import_title")}
           />
           <ActionButton
-            icon={loading ? "solar:refresh-circle-bold-duotone" : "solar:refresh-bold"}
-            label={t('worlds.refresh_button')}
+            icon={
+              loading
+                ? "solar:refresh-circle-bold-duotone"
+                : "solar:refresh-bold"
+            }
+            label={t("worlds.refresh_button")}
             variant="text"
             size="sm"
             onClick={handleRefresh}
@@ -1048,7 +1141,7 @@ export function WorldsTab({
                 displayItems.filter((item) => item.type === "server").length >
                   0)
             }
-            tooltip={t('common.refresh')}
+            tooltip={t("common.refresh")}
             className={loading ? "animate-spin" : ""}
           />
         </div>
@@ -1064,14 +1157,12 @@ export function WorldsTab({
         emptyStateIcon={"solar:planet-bold"}
         emptyStateMessage={
           effectiveSearchQuery
-            ? t('worlds.no_match_search')
-            : t('worlds.none_found')
+            ? t("worlds.no_match_search")
+            : t("worlds.none_found")
         }
-        emptyStateDescription={t('worlds.create_in_minecraft')}
+        emptyStateDescription={t("worlds.create_in_minecraft")}
         loadingItemCount={0}
       />
-
-
     </div>
   );
 }

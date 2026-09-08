@@ -91,6 +91,7 @@ export function PlayerActionsDisplay({
   const { t } = useTranslation();
   const accentColor = useThemeStore((state) => state.accentColor);
   const uiStylePreset = useThemeStore((state) => state.uiStylePreset);
+  const isFullRiskStyle = uiStylePreset === "fullrisk";
   const featureMode = useThemeStore((state) => state.featureMode);
   const setFeatureMode = useThemeStore((state) => state.setFeatureMode);
   const navigate = useNavigate();

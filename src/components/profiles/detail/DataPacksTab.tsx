@@ -274,9 +274,7 @@ export function DataPacksTab({
       fetchDataPacks();
     } catch (err) {
       console.error("Failed to toggle pack enabled state:", err);
-      setDataPacksError(
-        `Failed to toggle pack: ${parseErrorMessage(err)}`,
-      );
+      setDataPacksError(`Failed to toggle pack: ${parseErrorMessage(err)}`);
     } finally {
       setLoadingOperation(false);
     }
@@ -322,9 +320,7 @@ export function DataPacksTab({
       fetchDataPacks();
     } catch (err) {
       console.error("Failed to update pack:", err);
-      setDataPacksError(
-        `Failed to update pack: ${parseErrorMessage(err)}`,
-      );
+      setDataPacksError(`Failed to update pack: ${parseErrorMessage(err)}`);
       setDataPackUpdates({ ...dataPackUpdates });
     } finally {
       setUpdatingPacks((prev) => {
@@ -422,9 +418,7 @@ export function DataPacksTab({
       fetchDataPacks();
     } catch (err) {
       console.error("Failed to delete pack:", err);
-      setDataPacksError(
-        `Failed to delete pack: ${parseErrorMessage(err)}`,
-      );
+      setDataPacksError(`Failed to delete pack: ${parseErrorMessage(err)}`);
     } finally {
       setLoadingOperation(false);
     }
@@ -440,9 +434,7 @@ export function DataPacksTab({
       });
     } catch (err) {
       console.error("Failed to open directory:", err);
-      setDataPacksError(
-        `Failed to open directory: ${parseErrorMessage(err)}`,
-      );
+      setDataPacksError(`Failed to open directory: ${parseErrorMessage(err)}`);
     } finally {
       setLoadingOperation(false);
     }
@@ -622,7 +614,7 @@ export function DataPacksTab({
             <SearchInput
               value={localSearchQuery}
               onChange={setLocalSearchQuery}
-              placeholder={t('datapacks.search_placeholder')}
+              placeholder={t("datapacks.search_placeholder")}
             />
           </div>
         )}
@@ -710,7 +702,7 @@ export function DataPacksTab({
         }}
       >
         {loadingDataPacks ? (
-          <LoadingState message={t('datapacks.loading')} />
+          <LoadingState message={t("datapacks.loading")} />
         ) : dataPacksError ? (
           <div className="p-4 text-red-400 bg-red-900/20 rounded border border-red-700/30">
             <div className="flex items-center gap-2">
@@ -782,7 +774,9 @@ export function DataPacksTab({
                       curseforge_info: pack.curseforge_info,
                       sha1_hash: pack.sha1_hash || "",
                       is_disabled: pack.is_disabled,
-                      version: pack.modrinth_info?.version_number || pack.curseforge_info?.version_number,
+                      version:
+                        pack.modrinth_info?.version_number ||
+                        pack.curseforge_info?.version_number,
                     }}
                     isSelected={selectedPacks.has(pack.filename)}
                     onSelect={() => handleSelectPack(pack.filename)}
@@ -796,7 +790,7 @@ export function DataPacksTab({
                     onUpdate={hasUpdate ? updatePack : undefined}
                     updateVersion={updateVersion}
                     checkingUpdates={checkingUpdates || isUpdating}
-                    iconType="solar:cube-bold"
+                    iconType="solar:box-bold"
                     formatFileSize={formatFileSize}
                     onCheckForUpdates={checkForDataPackUpdates}
                   ></ContentPackRow>

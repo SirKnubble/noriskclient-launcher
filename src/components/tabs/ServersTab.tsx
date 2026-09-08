@@ -176,7 +176,7 @@ interface CustomServerPerformanceSettings {
 const SERVER_TYPES: Array<{ value: ServerType; label: string; icon: string }> =
   [
     { value: "VANILLA", label: "Vanilla", icon: "simple-icons:minecraft" },
-    { value: "FABRIC", label: "Fabric", icon: "simple-icons:fabric" },
+    { value: "FABRIC", label: "Fabric", icon: "solar:layers-bold" },
     { value: "FORGE", label: "Forge", icon: "simple-icons:curseforge" },
     { value: "NEO_FORGE", label: "NeoForge", icon: "solar:fire-bold" },
     { value: "QUILT", label: "Quilt", icon: "solar:layers-bold" },
@@ -1908,7 +1908,7 @@ function CustomServerDetails({
                       : "start the server to use console"
                   }
                   size="sm"
-                  icon={<Icon icon="solar:terminal-bold" className="h-4 w-4" />}
+                  icon={<Icon icon="solar:command-bold" className="h-4 w-4" />}
                 />
               </form>
             </div>

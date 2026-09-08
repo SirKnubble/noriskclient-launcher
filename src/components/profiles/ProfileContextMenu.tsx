@@ -31,17 +31,22 @@ interface ProfileContextMenuProps {
 }
 
 // Helper function to calculate optimal menu position
-const calculateMenuPosition = (x: number, y: number, menuWidth: number, menuHeight: number) => {
+const calculateMenuPosition = (
+  x: number,
+  y: number,
+  menuWidth: number,
+  menuHeight: number,
+) => {
   const viewport = {
     width: window.innerWidth,
     height: window.innerHeight,
   };
-  
+
   const padding = 16; // Distance from viewport edges
-  
+
   let adjustedX = x;
   let adjustedY = y;
-  
+
   // Adjust horizontal position
   if (x + menuWidth + padding > viewport.width) {
     adjustedX = x - menuWidth; // Show menu to the left of cursor
@@ -49,7 +54,7 @@ const calculateMenuPosition = (x: number, y: number, menuWidth: number, menuHeig
       adjustedX = viewport.width - menuWidth - padding; // Align with right edge
     }
   }
-  
+
   // Adjust vertical position
   if (y + menuHeight + padding > viewport.height) {
     adjustedY = y - menuHeight; // Show menu above cursor
@@ -57,11 +62,17 @@ const calculateMenuPosition = (x: number, y: number, menuWidth: number, menuHeig
       adjustedY = viewport.height - menuHeight - padding; // Align with bottom edge
     }
   }
-  
+
   // Ensure minimum padding from edges
-  adjustedX = Math.max(padding, Math.min(adjustedX, viewport.width - menuWidth - padding));
-  adjustedY = Math.max(padding, Math.min(adjustedY, viewport.height - menuHeight - padding));
-  
+  adjustedX = Math.max(
+    padding,
+    Math.min(adjustedX, viewport.width - menuWidth - padding),
+  );
+  adjustedY = Math.max(
+    padding,
+    Math.min(adjustedY, viewport.height - menuHeight - padding),
+  );
+
   return { x: adjustedX, y: adjustedY };
 };
 
@@ -103,13 +114,13 @@ export const ProfileContextMenu = forwardRef<
       const menuWidth = 220; // Approximate width based on content
       // Calculate height based on profile type and available options
       let menuHeight = 220; // Base height including settings, duplicate, open folder, export, shortcut
-      
+
       if (!profile.is_standard_version) {
         menuHeight = 280; // Non-standard: all settings + delete + separators
       } else if (onRepair) {
         menuHeight = 260; // Standard with repair: java settings + repair button + separators
       }
-      
+
       const newPosition = calculateMenuPosition(x, y, menuWidth, menuHeight);
       setAdjustedPosition(newPosition);
     } else {
@@ -152,14 +163,14 @@ export const ProfileContextMenu = forwardRef<
         duration: 0.15,
         ease: "power2.in",
         onComplete: () => {
-          if (typeof action === 'function') {
+          if (typeof action === "function") {
             action();
           }
           onClose();
         },
       });
     } else {
-      if (typeof action === 'function') {
+      if (typeof action === "function") {
         action();
       }
       onClose();
@@ -208,7 +219,7 @@ export const ProfileContextMenu = forwardRef<
         >
           <Icon icon="solar:settings-bold" className="w-5 h-5 text-white" />
           <span className="font-minecraft-ten text-base text-white/80">
-            {t('profiles.settingsLabel')}
+            {t("profiles.settingsLabel")}
           </span>
         </li>
         <li className="px-4 py-1">
@@ -227,7 +238,7 @@ export const ProfileContextMenu = forwardRef<
         >
           <Icon icon="solar:copy-bold" className="w-5 h-5 text-white" />
           <span className="font-minecraft-ten text-base text-white/80">
-            {t('profiles.cloneProfile')}
+            {t("profiles.cloneProfile")}
           </span>
         </li>
         <li
@@ -243,7 +254,7 @@ export const ProfileContextMenu = forwardRef<
             className="w-5 h-5 text-white"
           />
           <span className="font-minecraft-ten text-base text-white/80">
-            {t('profiles.openProfileFolder')}
+            {t("profiles.openProfileFolder")}
           </span>
         </li>
         <li
@@ -254,12 +265,9 @@ export const ProfileContextMenu = forwardRef<
             handleAction(onExport);
           }}
         >
-          <Icon
-            icon="solar:export-bold"
-            className="w-5 h-5 text-white"
-          />
+          <Icon icon="solar:export-bold" className="w-5 h-5 text-white" />
           <span className="font-minecraft-ten text-base text-white/80">
-            {t('profiles.exportProfile')}
+            {t("profiles.exportProfile")}
           </span>
         </li>
         <li
@@ -270,10 +278,7 @@ export const ProfileContextMenu = forwardRef<
             handleAction(onCreateDesktopShortcut);
           }}
         >
-          <Icon
-            icon="solar:shortcut-bold"
-            className="w-5 h-5 text-white"
-          />
+          <Icon icon="solar:link-bold" className="w-5 h-5 text-white" />
           <span className="font-minecraft-ten text-base text-white/80">
             Shortcut to Desktop
           </span>
@@ -300,13 +305,13 @@ export const ProfileContextMenu = forwardRef<
                 className="w-5 h-5 text-white"
               />
               <span className="font-minecraft-ten text-base text-white/80">
-                {t('profiles.repairProfile')}
+                {t("profiles.repairProfile")}
               </span>
             </li>
           </>
         )}
 
-        {(
+        {
           <>
             <li className="px-4 py-1">
               <div
@@ -329,11 +334,11 @@ export const ProfileContextMenu = forwardRef<
                 className="w-5 h-5 text-red-400"
               />
               <span className="font-minecraft-ten text-base text-red-400">
-                {t('profiles.deleteProfile')}
+                {t("profiles.deleteProfile")}
               </span>
             </li>
           </>
-        )}
+        }
       </ul>
       {confirmDialog}
     </div>

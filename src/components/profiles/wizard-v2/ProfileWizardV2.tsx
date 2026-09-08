@@ -30,7 +30,6 @@ import {
 import { useTranslation } from "react-i18next";
 import * as ProfileService from "../../../services/profile-service";
 import { parseErrorMessage } from "../../../utils/error-utils";
-import { parseErrorMessage } from "../../../utils/error-utils";
 
 function NrcCompatibleTooltipContent() {
   const { t } = useTranslation();

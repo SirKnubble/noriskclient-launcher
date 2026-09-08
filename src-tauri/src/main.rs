@@ -74,13 +74,13 @@ use commands::profile_command::{
     launch_profile, list_profile_backups, list_profile_screenshots, list_profiles, open_profile_folder,
     open_profile_latest_log, preview_import_pack, refresh_norisk_packs, refresh_standard_versions,
     repair_profile,
-    resolve_loader_version, restore_profile_backup, search_profiles, set_custom_mod_enabled, set_norisk_mod_status,
+    resolve_loader_version, restore_default_profiles, restore_profile_backup, search_profiles, set_custom_mod_enabled, set_norisk_mod_status,
     set_profile_mod_enabled, update_datapack_from_modrinth, update_modrinth_mod_version,
     update_profile, update_resourcepack_from_modrinth, update_shaderpack_from_modrinth,
 };
 
 // Use statements for registered commands only
-use commands::curseforge_commands::{get_curseforge_mods_by_ids, import_curseforge_pack, download_and_install_curseforge_modpack_command, get_curseforge_file_changelog_command, get_curseforge_mod_description_command};
+use commands::curseforge_commands::{get_curseforge_mods_by_ids, download_and_install_curseforge_modpack_command, get_curseforge_file_changelog_command, get_curseforge_mod_description_command};
 use commands::custom_server_command::{
     admin_block_custom_server_owner, admin_delete_custom_server, admin_restore_custom_server,
     admin_unblock_custom_server_owner,
@@ -622,7 +622,6 @@ let default_panic_hook = std::panic::take_hook();
             list_installed_server_addons,
             install_modrinth_server_addon,
             open_custom_server_backup_path,
-            import_curseforge_pack,
             download_and_install_curseforge_modpack_command,
             get_curseforge_file_changelog_command,
             get_curseforge_mod_description_command,

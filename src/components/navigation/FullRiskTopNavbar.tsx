@@ -17,8 +17,12 @@ export function FullRiskTopNavbar({
 }: FullRiskTopNavbarProps) {
   const { activeAccount } = useMinecraftAuthStore();
   const accentColor = useThemeStore((state) => state.accentColor);
-  const renderNavButton = (item: { id: string; label: string }, showDivider: boolean) => {
-    const disabled = ["mods", "skins", "capes"].includes(item.id) && !activeAccount;
+  const renderNavButton = (
+    item: { id: string; label: string },
+    showDivider: boolean,
+  ) => {
+    const disabled =
+      ["mods", "skins", "capes"].includes(item.id) && !activeAccount;
     const active = activeItem === item.id;
 
     return (
@@ -27,7 +31,7 @@ export function FullRiskTopNavbar({
           type="button"
           disabled={disabled}
           onClick={() => !disabled && onItemClick?.(item.id)}
-          className="font-minecraft text-[34px] px-[20px] lowercase transition-all duration-150 disabled:opacity-15 disabled:cursor-default"
+          className="font-smallcaps text-3xl px-[20px] lowercase transition-all duration-150 disabled:opacity-15 disabled:cursor-default"
           style={{
             color: active ? accentColor.value : "#ffffff",
             textShadow: active ? "2px 2px rgba(0,0,0,0.9)" : undefined,
@@ -37,7 +41,10 @@ export function FullRiskTopNavbar({
           {item.label}
         </button>
         {showDivider && (
-          <span className="font-minecraft text-[36px] text-white/80 px-[2px]" data-tauri-drag-region>
+          <span
+            className="font-smallcaps text-3xl text-white/80 px-[2px]"
+            data-tauri-drag-region
+          >
             |
           </span>
         )}
@@ -50,13 +57,20 @@ export function FullRiskTopNavbar({
       className="h-[56px] border-b-[3px]"
       style={{
         borderColor: `${accentColor.value}80`,
-        background: "linear-gradient(180deg, rgba(34,33,38,0.98) 0%, rgba(26,25,28,0.98) 100%)",
+        background:
+          "linear-gradient(180deg, rgba(34,33,38,0.98) 0%, rgba(26,25,28,0.98) 100%)",
       }}
       data-tauri-drag-region
     >
       <div className="relative h-full w-full" data-tauri-drag-region>
-        <div className="absolute inset-0 flex items-center justify-center px-24" data-tauri-drag-region>
-          <div className="flex items-center justify-center gap-0" data-tauri-drag-region>
+        <div
+          className="absolute inset-0 flex items-center justify-center px-24"
+          data-tauri-drag-region
+        >
+          <div
+            className="flex items-center justify-center gap-0"
+            data-tauri-drag-region
+          >
             {items.map((item, index) =>
               renderNavButton(item, index !== items.length - 1),
             )}

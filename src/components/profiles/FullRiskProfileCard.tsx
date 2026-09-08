@@ -5,9 +5,15 @@ import type { Profile } from "../../types/profile";
 import { useProfileLaunch } from "../../hooks/useProfileLaunch";
 import { Button } from "../ui/buttons/Button";
 import { ProfileIconV2 } from "./ProfileIconV2";
-import { createProfileDesktopShortcut, resolveImagePath } from "../../services/profile-service";
+import {
+  createProfileDesktopShortcut,
+  resolveImagePath,
+} from "../../services/profile-service";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { SettingsContextMenu, type ContextMenuItem } from "../ui/SettingsContextMenu";
+import {
+  SettingsContextMenu,
+  type ContextMenuItem,
+} from "../ui/SettingsContextMenu";
 import { useProfileSettingsStore } from "../../store/profile-settings-store";
 import { useProfileDuplicateStore } from "../../store/profile-duplicate-store";
 import { usePinnedProfilesStore } from "../../store/usePinnedProfilesStore";
@@ -44,9 +50,14 @@ export function FullRiskProfileCard({
 }: FullRiskProfileCardProps) {
   const { t } = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
-  const [resolvedBannerUrl, setResolvedBannerUrl] = useState<string | null>(null);
+  const [resolvedBannerUrl, setResolvedBannerUrl] = useState<string | null>(
+    null,
+  );
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [contextMenuPosition, setContextMenuPosition] = useState({
+    x: 0,
+    y: 0,
+  });
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const { isLaunching, handleLaunch } = useProfileLaunch({
     profileId: profile.id,
@@ -59,7 +70,12 @@ export function FullRiskProfileCard({
   const contextMenuId = `fullrisk-profile-${profile.id}`;
   const pinned = isPinned(profile.id);
   const trimmedProfileName = profile.name.toLowerCase();
-  const nameFontSize = trimmedProfileName.length > 24 ? 24 : trimmedProfileName.length > 18 ? 30 : 36;
+  const nameFontSize =
+    trimmedProfileName.length > 24
+      ? 24
+      : trimmedProfileName.length > 18
+        ? 30
+        : 36;
 
   const mappedBannerUrl = useMemo(() => {
     const matchedBanner = VERSION_BANNERS.find(({ match }) =>
@@ -80,12 +96,19 @@ export function FullRiskProfileCard({
       }
 
       try {
-        const resolvedPath = await resolveImagePath(profile.background.source, profile.id);
+        const resolvedPath = await resolveImagePath(
+          profile.background.source,
+          profile.id,
+        );
         if (!isMounted || !resolvedPath) {
           return;
         }
 
-        const resolvedUrl = ["absolutePath", "relativePath", "relativeProfile"].includes(profile.background.source.type)
+        const resolvedUrl = [
+          "absolutePath",
+          "relativePath",
+          "relativeProfile",
+        ].includes(profile.background.source.type)
           ? convertFileSrc(resolvedPath)
           : resolvedPath;
 
@@ -105,7 +128,11 @@ export function FullRiskProfileCard({
   }, [mappedBannerUrl, profile.background, profile.id]);
 
   const calculateContextMenuPosition = useCallback(
-    (anchorClientX: number, anchorClientY: number, alignRight: boolean = false) => {
+    (
+      anchorClientX: number,
+      anchorClientY: number,
+      alignRight: boolean = false,
+    ) => {
       const menuWidth = 200;
       const maxMenuHeight = 245;
       const viewportWidth = window.innerWidth;
@@ -114,17 +141,26 @@ export function FullRiskProfileCard({
 
       const spaceBelow = viewportHeight - anchorClientY - spacing;
       const spaceAbove = anchorClientY - spacing;
-      const openDownward = spaceBelow >= maxMenuHeight || spaceBelow >= spaceAbove;
+      const openDownward =
+        spaceBelow >= maxMenuHeight || spaceBelow >= spaceAbove;
       const menuHeight = Math.max(
         0,
         Math.min(maxMenuHeight, openDownward ? spaceBelow : spaceAbove),
       );
 
-      let menuTop = openDownward ? anchorClientY + 2 : anchorClientY - menuHeight - 2;
-      menuTop = Math.max(spacing, Math.min(menuTop, viewportHeight - menuHeight - spacing));
+      let menuTop = openDownward
+        ? anchorClientY + 2
+        : anchorClientY - menuHeight - 2;
+      menuTop = Math.max(
+        spacing,
+        Math.min(menuTop, viewportHeight - menuHeight - spacing),
+      );
 
       let menuLeft = alignRight ? anchorClientX - menuWidth : anchorClientX;
-      menuLeft = Math.max(spacing, Math.min(menuLeft, viewportWidth - menuWidth - spacing));
+      menuLeft = Math.max(
+        spacing,
+        Math.min(menuLeft, viewportWidth - menuWidth - spacing),
+      );
 
       return { x: menuLeft, y: menuTop };
     },
@@ -140,11 +176,18 @@ export function FullRiskProfileCard({
         setOpenContextMenuId(null);
       }
 
-      setContextMenuPosition(calculateContextMenuPosition(e.clientX, e.clientY));
+      setContextMenuPosition(
+        calculateContextMenuPosition(e.clientX, e.clientY),
+      );
       setIsContextMenuOpen(true);
       setOpenContextMenuId(contextMenuId);
     },
-    [calculateContextMenuPosition, contextMenuId, openContextMenuId, setOpenContextMenuId],
+    [
+      calculateContextMenuPosition,
+      contextMenuId,
+      openContextMenuId,
+      setOpenContextMenuId,
+    ],
   );
 
   const toggleContextMenuFromButton = useCallback(
@@ -163,11 +206,21 @@ export function FullRiskProfileCard({
       if (newState) {
         const buttonRect = e.currentTarget.getBoundingClientRect();
         setContextMenuPosition(
-          calculateContextMenuPosition(buttonRect.right, buttonRect.bottom, true),
+          calculateContextMenuPosition(
+            buttonRect.right,
+            buttonRect.bottom,
+            true,
+          ),
         );
       }
     },
-    [calculateContextMenuPosition, contextMenuId, isContextMenuOpen, openContextMenuId, setOpenContextMenuId],
+    [
+      calculateContextMenuPosition,
+      contextMenuId,
+      isContextMenuOpen,
+      openContextMenuId,
+      setOpenContextMenuId,
+    ],
   );
 
   const contextMenuItems: ContextMenuItem[] = [
@@ -218,20 +271,22 @@ export function FullRiskProfileCard({
         const result = await toast.promise(shareProfile(profile, 24), {
           loading: "Creating share code...",
           success: (share) => `Share code: ${share.code}`,
-          error: (err) => err instanceof Error ? err.message : String(err),
+          error: (err) => (err instanceof Error ? err.message : String(err)),
         });
-        await navigator.clipboard?.writeText(result.code).catch(() => undefined);
+        await navigator.clipboard
+          ?.writeText(result.code)
+          .catch(() => undefined);
       },
     },
     {
       id: "desktop-shortcut",
       label: "Shortcut to Desktop",
-      icon: "solar:shortcut-bold",
+      icon: "solar:link-bold",
       onClick: async () => {
         await toast.promise(createProfileDesktopShortcut(profile.id), {
           loading: "Creating desktop shortcut...",
           success: "Desktop shortcut created",
-          error: (err) => err instanceof Error ? err.message : String(err),
+          error: (err) => (err instanceof Error ? err.message : String(err)),
         });
       },
     },
@@ -299,7 +354,11 @@ export function FullRiskProfileCard({
       />
 
       <div className="absolute left-3 top-3 z-[3]">
-        <ProfileIconV2 profile={profile} size="md" className="shadow-[0_3px_0_rgba(0,0,0,0.35)]" />
+        <ProfileIconV2
+          profile={profile}
+          size="md"
+          className="shadow-[0_3px_0_rgba(0,0,0,0.35)]"
+        />
       </div>
 
       <div
@@ -351,7 +410,11 @@ export function FullRiskProfileCard({
             toggleContextMenuFromButton(e);
           }}
           data-action={!profile.is_standard_version ? "settings" : undefined}
-          title={!profile.is_standard_version ? t("profiles.profileOptions") : t("profiles.manageMods")}
+          title={
+            !profile.is_standard_version
+              ? t("profiles.profileOptions")
+              : t("profiles.manageMods")
+          }
         >
           {profile.is_standard_version ? "mods" : "settings"}
         </Button>
@@ -369,7 +432,9 @@ export function FullRiskProfileCard({
         profile={profile}
         isOpen={isContextMenuOpen}
         position={contextMenuPosition}
-        items={contextMenuItems.filter((item) => !item.destructive || !profile.is_standard_version)}
+        items={contextMenuItems.filter(
+          (item) => !item.destructive || !profile.is_standard_version,
+        )}
         positionMode="fixed"
         closeOnScroll={true}
         onClose={() => {

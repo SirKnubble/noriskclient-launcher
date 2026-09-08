@@ -31,6 +31,8 @@ export interface GroupTabsProps {
   addButtonText?: string;
   /** Custom add button icon */
   addButtonIcon?: string;
+  /** Force compact styling regardless of global UI style preset */
+  forceCompact?: boolean;
 }
 
 export function GroupTabs({
@@ -42,10 +44,12 @@ export function GroupTabs({
   className = "",
   addButtonText = "ADD GROUP",
   addButtonIcon = "solar:add-circle-bold",
+  forceCompact = false,
 }: GroupTabsProps) {
   const accentColor = useThemeStore((state) => state.accentColor);
   const uiStylePreset = useThemeStore((state) => state.uiStylePreset);
-  const isFullRiskStyle = uiStylePreset === "fullrisk";
+  const isFullRiskStyle = uiStylePreset === "fullrisk" && !forceCompact;
+  const isCompact = forceCompact;
 
   const handleGroupClick = (groupId: string) => {
     onGroupChange(groupId);
@@ -59,9 +63,11 @@ export function GroupTabs({
     <div className={`mb-4 ${className}`}>
       <div
         className={
-          isFullRiskStyle
-            ? "flex items-center gap-0 flex-wrap"
-            : "flex items-center gap-2 flex-wrap"
+          isCompact
+            ? "flex flex-col gap-1"
+            : isFullRiskStyle
+              ? "flex items-center gap-0 flex-wrap"
+              : "flex items-center gap-2 flex-wrap"
         }
       >
         {groups.map((group) => (
@@ -69,46 +75,61 @@ export function GroupTabs({
             <button
               onClick={() => handleGroupClick(group.id)}
               className={
-                isFullRiskStyle
-                  ? "px-4 py-1 font-smallcaps text-[28px] transition-all duration-150 lowercase"
-                  : `px-3 py-1 rounded-lg font-smallcaps text-lg transition-all duration-200 flex items-center gap-2 border-2 ${
+                isCompact
+                  ? `w-full border-l-2 px-4 py-1.5 text-left font-smallcaps text-base tracking-[0.14em] uppercase ${
                       activeGroup === group.id
-                        ? "text-white"
-                        : "text-white/70 bg-black/30 hover:bg-black/40 border-white/10 hover:border-white/20"
+                        ? "border-white text-white"
+                        : "border-transparent text-white/40 hover:text-white/75"
                     }`
+                  : isFullRiskStyle
+                    ? "px-4 py-1 font-smallcaps text-[28px] transition-all duration-150 lowercase"
+                    : `px-3 py-1 rounded-lg font-smallcaps text-lg transition-all duration-200 flex items-center gap-2 border-2 ${
+                        activeGroup === group.id
+                          ? "text-white"
+                          : "text-white/70 bg-black/30 hover:bg-black/40 border-white/10 hover:border-white/20"
+                      }`
               }
               style={
-                isFullRiskStyle
+                isCompact
                   ? {
-                      color:
-                        activeGroup === group.id
-                          ? accentColor.value
-                          : "rgba(255,255,255,0.75)",
-                      textShadow:
-                        activeGroup === group.id
-                          ? "2px 2px rgba(0,0,0,0.9)"
-                          : undefined,
-                      transform:
-                        activeGroup === group.id ? "scaleX(1.12)" : undefined,
-                    }
-                  : {
-                      backgroundColor:
-                        activeGroup === group.id
-                          ? `${accentColor.value}20`
-                          : undefined,
                       borderColor:
                         activeGroup === group.id
                           ? accentColor.value
                           : undefined,
                     }
+                  : isFullRiskStyle
+                    ? {
+                        color:
+                          activeGroup === group.id
+                            ? accentColor.value
+                            : "rgba(255,255,255,0.75)",
+                        textShadow:
+                          activeGroup === group.id
+                            ? "2px 2px rgba(0,0,0,0.9)"
+                            : undefined,
+                        transform:
+                          activeGroup === group.id ? "scaleX(1.12)" : undefined,
+                      }
+                    : {
+                        backgroundColor:
+                          activeGroup === group.id
+                            ? `${accentColor.value}20`
+                            : undefined,
+                        borderColor:
+                          activeGroup === group.id
+                            ? accentColor.value
+                            : undefined,
+                      }
               }
             >
-              {!isFullRiskStyle && group.icon && (
+              {!isCompact && !isFullRiskStyle && group.icon && (
                 <Icon icon={group.icon} className="w-4 h-4" />
               )}
-              <span className="lowercase">{group.name}</span>
+              <span className={isCompact ? "uppercase" : "lowercase"}>
+                {group.name}
+              </span>
             </button>
-            {isFullRiskStyle && (
+            {!isCompact && isFullRiskStyle && (
               <span className="font-minecraft text-[28px] text-white/70 px-1">
                 |
               </span>
