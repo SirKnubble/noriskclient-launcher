@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   Fragment,
@@ -15,7 +15,7 @@ import { ActionButton } from "../ui/ActionButton";
 import { Modal } from "../ui/Modal";
 import { SearchWithFilters } from "../ui/SearchWithFilters";
 import { SettingsSearchContext } from "../ui/settings/SettingsSearchContext";
-import { GroupTabs, type GroupTab } from "../ui/GroupTabs";
+import type { GroupTab } from "../ui/GroupTabs";
 import type { LauncherConfig } from "../../types/launcherConfig";
 import * as ConfigService from "../../services/launcher-config-service";
 import { useThemeStore } from "../../store/useThemeStore";
@@ -279,7 +279,10 @@ export function SettingsTab({ onClose }: SettingsTabProps) {
           variant="icon-only"
           tooltip="Run First Install Setup Wizard again"
           size="sm"
-          onClick={resetFirstInstallSetupWizard}
+          onClick={() => {
+            onClose();
+            resetFirstInstallSetupWizard();
+          }}
         />
       }
     >
@@ -295,29 +298,72 @@ export function SettingsTab({ onClose }: SettingsTabProps) {
             className="mb-3 w-full"
           />
           <div className="flex-1 overflow-y-auto custom-scrollbar">
-            <GroupTabs
-              groups={groups}
-              activeGroup={activeTab}
-              onGroupChange={(id) => selectTab(id as SettingsTabId)}
-              showAddButton={false}
-              forceCompact
-            />
-            {sectionDefs[activeTab].map((section) => (
-              <button
-                key={section.id}
-                type="button"
-                data-section-id={section.id}
-                onClick={() => scrollToSection(section.id)}
-                className={`block w-full border-l-2 px-4 py-1.5 text-left font-smallcaps text-base tracking-[0.14em] uppercase ${activeSection === section.id ? "border-white text-white" : "border-transparent text-white/40 hover:text-white/75"}`}
-                style={
-                  activeSection === section.id
-                    ? { borderColor: accentColor.value }
-                    : undefined
-                }
-              >
-                {section.label}
-              </button>
-            ))}
+            {groups.map((group) => {
+              const isActive = activeTab === group.id;
+
+              return (
+                <div key={group.id} className="mb-2">
+                  <button
+                    type="button"
+                    onClick={() => selectTab(group.id as SettingsTabId)}
+                    className={`flex w-full items-center gap-3 px-4 py-2 text-left transition-colors ${
+                      isActive
+                        ? "text-white"
+                        : "text-white/60 hover:text-white/80"
+                    }`}
+                    style={
+                      isActive
+                        ? {
+                            backgroundColor: `${accentColor.value}33`,
+                            borderRadius: 0,
+                          }
+                        : undefined
+                    }
+                  >
+                    {group.icon && (
+                      <Icon
+                        icon={group.icon}
+                        className="h-6 w-6 flex-shrink-0"
+                        style={{
+                          color: isActive
+                            ? accentColor.value
+                            : "rgba(255,255,255,0.75)",
+                        }}
+                      />
+                    )}
+                    <span className="font-smallcaps text-[24px] uppercase leading-none tracking-[0.08em]">
+                      {group.name}
+                    </span>
+                  </button>
+
+                  {isActive && (
+                    <div className="mt-1 space-y-1 border-l border-white/20 pl-3">
+                      {(sectionDefs[group.id as SettingsTabId] ?? []).map(
+                        (section) => {
+                          const isSectionActive = activeSection === section.id;
+
+                          return (
+                            <button
+                              key={section.id}
+                              type="button"
+                              data-section-id={section.id}
+                              onClick={() => scrollToSection(section.id)}
+                              className={`block w-full px-3 py-1 text-left font-smallcaps text-[20px] uppercase leading-none tracking-[0.08em] ${
+                                isSectionActive
+                                  ? "text-white"
+                                  : "text-white/45 hover:text-white/75"
+                              }`}
+                            >
+                              {section.label}
+                            </button>
+                          );
+                        },
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </aside>
         <div className="my-3 border-l border-white/10" />
