@@ -214,25 +214,15 @@ export function MainLaunchButton({
       <div
         className={
           isFullRiskStyle
-            ? "w-full flex flex-col items-center justify-center leading-none -mt-3"
+            ? "w-full flex flex-col items-center justify-center leading-none"
             : "w-full flex flex-col items-center justify-center leading-none -mt-4"
         }
       >
-        <span
-          className={
-            isFullRiskStyle
-              ? "text-[52px] text-center lowercase text-shadow"
-              : "text-5xl text-center lowercase"
-          }
-        >
-          {actionText}
-        </span>
+        <span className="text-4xl text-center lowercase">{actionText}</span>
         {displaySubText && (
           <span
             className={cn(
-              isFullRiskStyle
-                ? "text-[10px] font-minecraft-ten tracking-[0.2em] mt-1 text-center uppercase whitespace-nowrap overflow-hidden text-ellipsis"
-                : "text-xs font-minecraft-ten tracking-normal -mt-1 text-center normal-case whitespace-nowrap overflow-hidden text-ellipsis",
+              "text-xs font-minecraft tracking-normal text-center normal-case whitespace-nowrap overflow-hidden text-ellipsis",
               isButtonLaunching ? "max-w-64" : "",
               statusColorClass,
             )}

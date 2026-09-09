@@ -220,7 +220,7 @@ export function PlayerActionsDisplay({
               )}
             </div>
             <div
-              className={`absolute left-0 right-0 flex justify-center px-4 bottom-2`}
+              className={`absolute left-0 right-0 flex justify-center px-4 ${isFullRiskStyle ? "bottom-4" : "bottom-2"}`}
             >
               {featureMode ? (
                 <ServerLaunchCard

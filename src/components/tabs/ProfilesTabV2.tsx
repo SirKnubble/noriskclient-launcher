@@ -295,8 +295,17 @@ export function ProfilesTabV2() {
   };
 
   // Columns per layout mode (also used by the virtual grid).
-  const columnCount =
-    layoutMode === "grid" ? 2 : layoutMode === "compact" ? 3 : 1;
+  const columnCount = isFullRiskStyle
+    ? layoutMode === "grid"
+      ? 3
+      : layoutMode === "compact"
+        ? 3
+        : 1
+    : layoutMode === "grid"
+      ? 2
+      : layoutMode === "compact"
+        ? 3
+        : 1;
 
   // Filter -> sort (memoized; avoids re-running on unrelated re-renders like hover).
   const filteredProfiles = useMemo(
@@ -396,10 +405,10 @@ export function ProfilesTabV2() {
 
   const gridColsClass =
     columnCount === 3
-      ? "grid-cols-3"
+      ? "grid-cols-3 justify-center"
       : columnCount === 2
-        ? "grid-cols-2"
-        : "grid-cols-1";
+        ? "grid-cols-2 justify-center"
+        : "grid-cols-1 justify-center";
 
   if (loading) {
     return <LoadingState message={t("profiles.loadingProfiles")} />;

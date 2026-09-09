@@ -82,7 +82,7 @@ export function GroupTabs({
                         : "border-transparent text-white/40 hover:text-white/75"
                     }`
                   : isFullRiskStyle
-                    ? "px-4 py-1 font-smallcaps text-[28px] transition-all duration-150 lowercase"
+                    ? "px-4 py-1 font-smallcaps text-[20px] transition-all duration-150 lowercase"
                     : `px-3 py-1 rounded-lg font-smallcaps text-lg transition-all duration-200 flex items-center gap-2 border-2 ${
                         activeGroup === group.id
                           ? "text-white"
@@ -130,7 +130,7 @@ export function GroupTabs({
               </span>
             </button>
             {!isCompact && isFullRiskStyle && (
-              <span className="font-minecraft text-[28px] text-white/70 px-1">
+              <span className="font-minecraft text-[20px] text-white/70 px-1">
                 |
               </span>
             )}

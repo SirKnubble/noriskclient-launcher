@@ -72,10 +72,10 @@ export function FullRiskProfileCard({
   const trimmedProfileName = profile.name.toLowerCase();
   const nameFontSize =
     trimmedProfileName.length > 24
-      ? 24
+      ? 16
       : trimmedProfileName.length > 18
-        ? 30
-        : 36;
+        ? 17
+        : 18;
 
   const mappedBannerUrl = useMemo(() => {
     const matchedBanner = VERSION_BANNERS.find(({ match }) =>
@@ -330,7 +330,7 @@ export function FullRiskProfileCard({
 
   return (
     <div
-      className="relative flex h-[200px] w-[325px] flex-col justify-end items-start overflow-hidden transition-all duration-150 fullrisk-panel"
+      className="relative mx-auto flex h-[230px] w-full max-w-full flex-col justify-end items-start overflow-hidden transition-all duration-150 fullrisk-panel"
       style={{ borderWidth: "4px" }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -362,7 +362,7 @@ export function FullRiskProfileCard({
       </div>
 
       <div
-        className="absolute right-[12px] top-[10px] z-[3] font-minecraft text-[18px] lowercase text-white/80"
+        className="absolute right-[12px] top-[10px] z-[3] font-minecraft text-[14px] lowercase text-white/80"
         style={{
           textShadow: "2px 2px rgba(0,0,0,0.9)",
         }}
@@ -383,7 +383,7 @@ export function FullRiskProfileCard({
       </div>
 
       <div
-        className="absolute bottom-[7px] right-[12px] z-[2] font-minecraft text-[22px] lowercase leading-none text-white/95"
+        className="absolute bottom-[7px] right-[12px] z-[2] font-minecraft text-[14px] lowercase leading-none text-white/95"
         style={{
           transform: isHovered ? "translateY(-47px)" : undefined,
           textShadow: "2px 2px rgba(0,0,0,0.9)",

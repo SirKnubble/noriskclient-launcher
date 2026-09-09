@@ -31,7 +31,7 @@ export function FullRiskTopNavbar({
           type="button"
           disabled={disabled}
           onClick={() => !disabled && onItemClick?.(item.id)}
-          className="font-smallcaps text-3xl px-[20px] lowercase transition-all duration-150 disabled:opacity-15 disabled:cursor-default"
+          className="font-smallcaps text-2xl px-[20px] lowercase transition-all duration-150 disabled:opacity-15 disabled:cursor-default"
           style={{
             color: active ? accentColor.value : "#ffffff",
             textShadow: active ? "2px 2px rgba(0,0,0,0.9)" : undefined,
@@ -42,7 +42,7 @@ export function FullRiskTopNavbar({
         </button>
         {showDivider && (
           <span
-            className="font-smallcaps text-3xl text-white/80 px-[2px]"
+            className="font-smallcaps text-2xl text-white/80 px-[2px]"
             data-tauri-drag-region
           >
             |
